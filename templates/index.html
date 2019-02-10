@@ -25,28 +25,38 @@
       <div class="col">
         <h2>CSV Plot</h2>
         <div class='row'>
-          <div id='field-filters' class="col collection">
+          <div class='col'>
             Filters
+            <div id='field-filters' class="collection"></div>
           </div>
-          <div id='field-columns' class="col collection">
+          <div class='col'>
             Columns
+            <span class='dot category'></span>
+            <div id='field-columns' class="collection category"></div>
           </div>
         </div>
         <div class='row'>
-          <div id='field-rows' class="col collection">
+          <div class='col'>
             Rows
+            <span class='dot category'></span>
+            <div id='field-rows' class="collection category"></div>
           </div>
-          <div id='field-values' class="col collection">
+          <div class='col'>
             Values
+            <span class='dot number'></span>
+            <div id='field-values' class="collection number"></div>
           </div>
         </div>
         <div class='row'>
-          <div id='field-fields' class="col collection">
+          <div class='col'>
             Fields
+            <span class='dot category'></span>
+            <span class='dot number'></span>
+            <div id='field-fields' class="collection"></div>
           </div>
         </div>
         <form id='field-form'>
-          Aggregate: 
+          Aggregate:
           <select name='aggregate' class="form-control">
             <option value='average'>Average</option>
             <option value='sum'>Sum</option>

@@ -9,15 +9,13 @@ body {
 
 .collection {
   background-color: rgb(207, 207, 207);
-  margin: 5px;
+  margin-top: 5px;
+  margin-bottom: 5px;
   padding: 5px;
+  min-height: 32px;
 }
 
-.collection p {
-  background-color: rgb(236, 236, 236);
-}
-
-.number {
+.number.field {
     background-color: rgb(93, 150, 255);
     margin: 5px;
     padding: 5px;
@@ -27,7 +25,7 @@ body {
     border-radius: 5px;
 }
 
-.category {
+.category.field {
   background-color: rgb(255, 93, 93);
   margin: 5px;
   padding: 5px;
@@ -36,6 +34,23 @@ body {
   font-size: 15px;
   border-radius: 5px;
 }
+
+.dot {
+  height: 15px;
+  width: 15px;
+  background-color: #bbb;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.dot.number {
+  background-color: rgb(93, 150, 255);
+}
+
+.dot.category {
+  background-color: rgb(255, 93, 93);
+}
+
 
 tr:nth-child(even) {
   background-color: #f2f2f2

@@ -2,12 +2,27 @@
 
 
 $(document).ready(function() {
-    dragula($('.collection').toArray());
+    var drake = dragula(
+        $('.collection').toArray(), 
+        {
+            moves: function (element, source, handle, sibling) {
+                return $(element).hasClass('field');
+            },
+            accepts: function(element, target, source, sibling) {
+                for (let kind of ['number', 'category']) {
+                    if ($(element).hasClass(kind) && $(target).hasClass(kind)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        }
+    );
 
     var promise = postJson('/getfields');
     promise.done(function(typeByField) {
         $.each(typeByField, function(field, type) {
-            $('#field-fields').append(`<div class=${type}>${field}</div>`);
+            $('#field-fields').append(`<div class="${type} field">${field}</div>`);
         });
     });
 
