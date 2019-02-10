@@ -26,6 +26,14 @@ FUNC_BY_AGGREGATE = {
     'sum': np.sum,
 }
 
+CATEGORY_PLOTS = {
+    'bar',
+    'point',
+    'strip',
+    'box',
+    'violin',
+}
+
 
 @click.command()
 @click.option('--host', default='127.0.0.1', show_default=True, 
@@ -78,8 +86,7 @@ def dashboard(host=None, port=None, df=None):
                                         columns=columns, aggfunc=aggregation_fn)
                 table = to_html_table(pivot_df)
                 return table
-
-            elif kind == 'barplot':
+            if kind in CATEGORY_PLOTS:
                 if len(columns) == 0:
                     raise ValueError('At least one column is required')
                 elif len(columns) == 1:
@@ -93,7 +100,7 @@ def dashboard(host=None, port=None, df=None):
 
                 y = values[0]
                 
-                g = sns.catplot(x=x, y=y, hue=hue, row=row, col=col, data=df, estimator=aggregation_fn, kind='bar', 
+                g = sns.catplot(x=x, y=y, hue=hue, row=row, col=col, data=df, estimator=aggregation_fn, kind=kind, 
                             margin_titles=True)
                 return fig_to_html(g)
 
@@ -101,7 +108,6 @@ def dashboard(host=None, port=None, df=None):
                 raise ValueError('Invalid kind: {}'.format(kind))
 
         except Exception as e:
-            raise
             return cgi.escape(get_class_name(e) + ': ' + str(e)), 400
 
     app.run(host=host, port=port, debug=True)
