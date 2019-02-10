@@ -5,10 +5,10 @@ $(document).ready(function() {
     dragula($('.collection').toArray());
 
     var promise = postJson('/getfields');
-    promise.done(function(fields) {
-        for (let field of fields) {
-            $('#field-fields').append('<div>' + field + '</div>')
-        }
+    promise.done(function(typeByField) {
+        $.each(typeByField, function(field, type) {
+            $('#field-fields').append(`<div class=${type}>${field}</div>`);
+        });
     });
 
     $('#apply').click(function() {

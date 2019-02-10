@@ -17,7 +17,7 @@ body {
   background-color: rgb(236, 236, 236);
 }
 
-.collection div {
+.number {
     background-color: rgb(93, 150, 255);
     margin: 5px;
     padding: 5px;
@@ -25,6 +25,16 @@ body {
     cursor: grab;
     font-size: 15px;
     border-radius: 5px;
+}
+
+.category {
+  background-color: rgb(255, 93, 93);
+  margin: 5px;
+  padding: 5px;
+  cursor: -webkit-grab; 
+  cursor: grab;
+  font-size: 15px;
+  border-radius: 5px;
 }
 
 tr:nth-child(even) {

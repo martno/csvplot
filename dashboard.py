@@ -57,7 +57,7 @@ def dashboard(host=None, port=None, df=None):
 
     @app.route('/getfields', methods=['POST'])
     def getfields():
-        return jsonify(list(df.columns))
+        return jsonify({col: dtype_to_type(df[col].dtype) for col in df.columns})
 
     @app.route('/getresults', methods=['POST'])
     def getresults():
@@ -105,6 +105,12 @@ def dashboard(host=None, port=None, df=None):
             return cgi.escape(get_class_name(e) + ': ' + str(e)), 400
 
     app.run(host=host, port=port, debug=True)
+
+
+def dtype_to_type(dtype):
+    if dtype.name in ('category', 'object', 'bool'):
+        return 'category'
+    return 'number'
 
 
 def form_data_to_dict(form_data):
