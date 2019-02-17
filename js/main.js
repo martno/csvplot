@@ -54,9 +54,13 @@ $(document).ready(function() {
     $('#apply').click(function() {
         var fieldData = {};
         for (let variable of ['columns', 'rows', 'values']) {
-            fieldData[variable] = $('#field-' + variable).children('div').map(function(item) {
-                return $(this).text();
-            }).get();
+            var fields = [];
+            for (let child of $('#field-' + variable).children('div').toArray()) {
+                if (!$(child).hasClass('transparent')) {
+                    fields.push($(child).text());
+                }                
+            }
+            fieldData[variable] = fields;
         }
 
         var json_data = {

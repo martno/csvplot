@@ -111,16 +111,18 @@ def dashboard(host=None, port=None, df=None):
             if plot_group == 'category-plot':
                 if len(columns) == 0:
                     raise ValueError('At least one column is required')
+                elif len(columns) > 3:
+                    raise ValueError('No more than 3 columns allowed')
                 elif len(columns) == 1:
                     col, x, hue = None, columns[0], None
                 elif len(columns) == 2:
                     col, x, hue = None, columns[0], columns[1]
                 else:
-                    col, x, hue = columns[-3:]
+                    col, x, hue = columns
 
-                row = rows[-1] if rows else None
+                row = rows[0] if rows else None
 
-                y = values[-1]
+                y = values[0]
 
                 fig = sns.catplot(x=x, y=y, hue=hue, row=row, col=col, data=df, estimator=aggregation_fn, kind=kind, 
                             margin_titles=True, height=4)
