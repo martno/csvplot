@@ -83,6 +83,8 @@ $(document).ready(function() {
     });
 
     updateFields();
+
+    enableTooltips();
 });
 
 
@@ -102,6 +104,11 @@ function updateFields() {
         var rangeString = rangeToString(range);
         $(`#${container}-display`).html(rangeString);
     }
+}
+
+
+function enableTooltips() {
+    $('[data-toggle="tooltip"]').tooltip();
 }
 
 
