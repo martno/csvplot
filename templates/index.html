@@ -24,6 +24,20 @@
     <div class="row">
       <div class="col">
         <h2>CSV Plot</h2>
+
+        <div class='row'>
+          <div class='col'>
+            Categories
+            <span class='dot category'></span>
+            <div id='field-categories' class="collection category"></div>
+          </div>
+          <div class='col'>
+            Numbers
+            <span class='dot number'></span>
+            <div id='field-numbers' class="collection number"></div>
+          </div>
+        </div>
+
         <div class='row'>
           <div class='col'>
             Filters
@@ -32,29 +46,42 @@
           <div class='col'>
             Columns
             <span class='dot category'></span>
+            <div id='columns-display'></div>
             <div id='field-columns' class="collection category"></div>
           </div>
         </div>
+
         <div class='row'>
           <div class='col'>
             Rows
             <span class='dot category'></span>
+            <div id='rows-display'></div>
             <div id='field-rows' class="collection category"></div>
           </div>
           <div class='col'>
             Values
             <span class='dot number'></span>
+            <div id='values-display'></div>
             <div id='field-values' class="collection number"></div>
           </div>
         </div>
-        <div class='row'>
-          <div class='col'>
-            Fields
-            <span class='dot category'></span>
-            <span class='dot number'></span>
-            <div id='field-fields' class="collection category number"></div>
+
+        <!-- form-check: a single class for both input types that improves the layout and behavior of their HTML elements -->
+        <form id='plot-category'>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="plot-category" id="pivot-category" value="pivot-category" checked>
+            <label class="form-check-label" for="pivot-category">
+              Pivot
+            </label>
           </div>
-        </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="plot-category" id="catplot-category" value="catplot-category">
+            <label class="form-check-label" for="catplot-category">
+              Catgeory plots
+            </label>
+          </div>
+        </form>
+
         <form id='field-form'>
           Aggregate:
           <select name='aggregate' class="form-control">

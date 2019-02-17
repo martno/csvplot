@@ -1,6 +1,20 @@
 "use strict";
 
 
+var LIMITS_BY_CATEGORY = {
+    'pivot-category': {
+        'rows': {'min': 0, 'max': Infinity},
+        'columns': {'min': 0, 'max': Infinity},
+        'values': {'min': 0, 'max': Infinity}
+    },
+    'catplot-category': {
+        'rows': {'min': 0, 'max': 1},
+        'columns': {'min': 1, 'max': 3},
+        'values': {'min': 1, 'max': 1},
+    }
+};
+
+
 $(document).ready(function() {
     var drake = dragula(
         $('.collection').toArray(), 
@@ -19,11 +33,22 @@ $(document).ready(function() {
         }
     );
 
-    var promise = postJson('/getfields');
-    promise.done(function(typeByField) {
-        $.each(typeByField, function(field, type) {
-            $('#field-fields').append(`<div class="${type} field">${field}</div>`);
-        });
+    drake.on('drop', function(element, target, source, sibling) {
+        updateFields();
+    });
+
+    var promise = postJson('/getcategoryfields');
+    promise.done(function(fields) {
+        for (let field of fields) {
+            $('#field-categories').append(`<div class="category field">${field}</div>`);
+        }
+    });
+
+    var promise = postJson('/getnumberfields');
+    promise.done(function(fields) {
+        for (let field of fields) {
+            $('#field-numbers').append(`<div class="number field">${field}</div>`);
+        }
     });
 
     $('#apply').click(function() {
@@ -51,7 +76,69 @@ $(document).ready(function() {
             $('#apply').attr('disabled', false);
         });
     });
+
+
+    $('input[type=radio][name=plot-category]').change(function() {
+        updateFields();
+    });
+
+    updateFields();
 });
+
+
+function updateFields() {
+    $('.collection').find('.field').removeClass('transparent');
+
+    for (let container of ['rows', 'columns', 'values']) {
+        var fields = $(`#field-${container}`).find('.field').toArray();
+
+        var plotCategory = getSelectedRadioButton('#plot-category', 'plot-category');
+        var rangeByContainer = LIMITS_BY_CATEGORY[plotCategory];
+        var range = rangeByContainer[container]
+        var numOpaque = range.max;
+
+        updateTransparentFields(fields, numOpaque);
+
+        var rangeString = rangeToString(range);
+        $(`#${container}-display`).html(rangeString);
+    }
+}
+
+
+function getSelectedRadioButton(formId, groupName) { 
+    return $(`input[name=${groupName}]:checked`, formId).val();
+}
+
+
+function updateTransparentFields(fields, numOpaque) {
+    for (let i of range(fields.length)) {
+        var field = $(fields[i]);
+        if (i < fields.length - numOpaque) {
+            field.addClass('transparent');
+        } else {
+            field.removeClass('transparent');                
+        }
+    };
+}
+
+
+function range(n) {
+    return Array(n).keys();
+}
+
+
+function rangeToString(range) {
+    var min = range.min;
+    var max = range.max;
+    if (max === Infinity) {
+        max = '&infin;';
+    }
+
+    if (min === max) {
+        return `${min}`;
+    }
+    return `${min}&rarr;${max}`
+}
 
 
 function postJson(url, data) {

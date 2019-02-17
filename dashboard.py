@@ -63,9 +63,13 @@ def dashboard(host=None, port=None, df=None):
     def send_css(path):
         return send_from_directory('css', path)
 
-    @app.route('/getfields', methods=['POST'])
-    def getfields():
-        return jsonify({col: dtype_to_type(df[col].dtype) for col in df.columns})
+    @app.route('/getcategoryfields', methods=['POST'])
+    def getcategoryfields():
+        return jsonify(sorted(col for col in df.columns if dtype_to_type(df[col].dtype) == 'category'))
+
+    @app.route('/getnumberfields', methods=['POST'])
+    def getnumberfields():
+        return jsonify(sorted(col for col in df.columns if dtype_to_type(df[col].dtype) == 'number'))
 
     @app.route('/getresults', methods=['POST'])
     def getresults():
@@ -99,10 +103,10 @@ def dashboard(host=None, port=None, df=None):
                 row = rows[-1] if rows else None
 
                 y = values[0]
-                
-                g = sns.catplot(x=x, y=y, hue=hue, row=row, col=col, data=df, estimator=aggregation_fn, kind=kind, 
-                            margin_titles=True)
-                return fig_to_html(g)
+
+                fig = sns.catplot(x=x, y=y, hue=hue, row=row, col=col, data=df, estimator=aggregation_fn, kind=kind, 
+                            margin_titles=True, height=4)
+                return fig_to_html(fig)
 
             else:
                 raise ValueError('Invalid kind: {}'.format(kind))
