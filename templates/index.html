@@ -61,40 +61,77 @@
           </div>
         </div>
 
-        <!-- form-check: a single class for both input types that improves the layout and behavior of their HTML elements -->
-        <form id='plot-category'>
-          <div class="form-check">
-            <input class="form-check-input" type="radio" name="plot-category" id="pivot-category" value="pivot-category" checked>
-            <label class="form-check-label" for="pivot-category">
-              Pivot
-            </label>
-          </div>
-          <div class="form-check">
-            <input class="form-check-input" type="radio" name="plot-category" id="catplot-category" value="catplot-category">
-            <label class="form-check-label" for="catplot-category">
-              Catgeory plots
-            </label>
-          </div>
-        </form>
-
         <form id='field-form'>
           Aggregate:
           <select name='aggregate' class="form-control">
             <option value='average'>Average</option>
             <option value='sum'>Sum</option>
           </select>
-          <select name='kind' class="form-control">
-            <option value='pivot-table'>Pivot Table</option>
-            <option value='bar'>Bar plot</option>
-            <option value='strip'>Strip plot</option>
-            <option value='box'>Box plot</option>
-            <option value='violin'>Violin plot</option>
-            <option value='point'>Point plot</option>
-          </select>
+
+          <!-- form-check: a single class for both input types that improves the layout and behavior of their HTML elements -->
+          <div class="card m-1">
+            <div class="card-header p-1">
+              Pivot
+            </div>
+            <div class='p-1'>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="plot-category" id="plot--pivot-table" value="pivot--pivot-table"
+                  checked>
+                <label class="form-check-label" for="plot--pivot-table">
+                  Pivot table
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="plot-category" id="plot--heatmap" value="pivot--heatmap">
+                <label class="form-check-label" for="plot--heatmap">
+                  Heatmap
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="card m-1">
+            <div class="card-header p-1">
+              Category plots
+            </div>
+            <div class='p-1'>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="plot-category" id="plot--bar-plot" value="category-plot--bar">
+                <label class="form-check-label" for="plot--bar-plot">
+                  Bar plot
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="plot-category" id="plot--strip-plot" value="category-plot--strip">
+                <label class="form-check-label" for="plot--strip-plot">
+                  Strip plot
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="plot-category" id="plot--box-plot" value="category-plot--box">
+                <label class="form-check-label" for="plot--box-plot">
+                  Box plot
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="plot-category" id="plot--violin-plot" value="category-plot--violin">
+                <label class="form-check-label" for="plot--violin-plot">
+                  Violin plot
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="plot-category" id="plot--point-plot" value="category-plot--point">
+                <label class="form-check-label" for="plot--point-plot">
+                  Point plot
+                </label>
+              </div>
+            </div>
+          </div>
         </form>
+
         <br>
         <button id="apply" class="btn btn-primary" style="width: 100%;">Apply</button>
       </div>
+
       <div class="col-10">
         <div id="main-window"></div>
       </div>

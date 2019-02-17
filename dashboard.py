@@ -12,6 +12,7 @@ import click
 import io
 import base64
 from bs4 import BeautifulSoup
+from pprint import pprint
 
 import numpy as np
 import pandas as pd
@@ -76,21 +77,38 @@ def dashboard(host=None, port=None, df=None):
         try:
             payload = request.json
 
+            print(payload)
+
             form_dict = form_data_to_dict(payload['formData'])
+            
+            pprint(form_dict)
+
             aggregation_fn  = FUNC_BY_AGGREGATE[form_dict['aggregate']]
-            kind = form_dict['kind']
+
+            plot_category = form_dict['plot-category']
+            plot_group, kind = plot_category.split('--')
 
             fields = payload['fieldData']
             rows = fields['rows']
             columns = fields['columns']
             values = fields['values']
 
-            if kind == 'pivot-table':
+            if plot_group == 'pivot':
                 pivot_df = pd.pivot_table(df, values=values, index=rows, 
-                                        columns=columns, aggfunc=aggregation_fn)
-                table = to_html_table(pivot_df)
-                return table
-            if kind in CATEGORY_PLOTS:
+                                          columns=columns, aggfunc=aggregation_fn)
+                if kind == 'pivot-table':
+                    table = to_html_table(pivot_df)
+                    return table
+
+                elif kind == 'heatmap':
+                    plt.figure()  # Reset figure
+                    fig = sns.heatmap(pivot_df, annot=True).get_figure()
+                    return fig_to_html(fig)
+
+                else:
+                    raise ValueError('Invalid kind: {}'.format(kind))
+
+            if plot_group == 'category-plot':
                 if len(columns) == 0:
                     raise ValueError('At least one column is required')
                 elif len(columns) == 1:
@@ -102,7 +120,7 @@ def dashboard(host=None, port=None, df=None):
 
                 row = rows[-1] if rows else None
 
-                y = values[0]
+                y = values[-1]
 
                 fig = sns.catplot(x=x, y=y, hue=hue, row=row, col=col, data=df, estimator=aggregation_fn, kind=kind, 
                             margin_titles=True, height=4)

@@ -2,12 +2,12 @@
 
 
 var LIMITS_BY_CATEGORY = {
-    'pivot-category': {
+    'pivot': {
         'rows': {'min': 0, 'max': Infinity},
         'columns': {'min': 0, 'max': Infinity},
         'values': {'min': 0, 'max': Infinity}
     },
-    'catplot-category': {
+    'category-plot': {
         'rows': {'min': 0, 'max': 1},
         'columns': {'min': 1, 'max': 3},
         'values': {'min': 1, 'max': 1},
@@ -77,7 +77,6 @@ $(document).ready(function() {
         });
     });
 
-
     $('input[type=radio][name=plot-category]').change(function() {
         updateFields();
     });
@@ -94,8 +93,10 @@ function updateFields() {
     for (let container of ['rows', 'columns', 'values']) {
         var fields = $(`#field-${container}`).find('.field').toArray();
 
-        var plotCategory = getSelectedRadioButton('#plot-category', 'plot-category');
-        var rangeByContainer = LIMITS_BY_CATEGORY[plotCategory];
+        var plotCategory = getSelectedRadioButton('#field-form', 'plot-category');
+        var category = plotCategory.split('--')[0];
+
+        var rangeByContainer = LIMITS_BY_CATEGORY[category];
         var range = rangeByContainer[container]
         var numOpaque = range.max;
 
