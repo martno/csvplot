@@ -10,7 +10,7 @@ var LIMITS_BY_CATEGORY = {
     'category-plot': {
         'rows': {'min': 0, 'max': 1},
         'columns': {'min': 1, 'max': 3},
-        'values': {'min': 1, 'max': 1},
+        'values': {'min': 1, 'max': Infinity}
     }
 };
 

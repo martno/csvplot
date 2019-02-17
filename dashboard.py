@@ -11,8 +11,10 @@ import re
 import click
 import io
 import base64
+import traceback
 from bs4 import BeautifulSoup
 from pprint import pprint
+from PIL import Image
 
 import numpy as np
 import pandas as pd
@@ -122,19 +124,68 @@ def dashboard(host=None, port=None, df=None):
 
                 row = rows[0] if rows else None
 
-                y = values[0]
+                images = []
+                for y in values:
+                    fig = sns.catplot(x=x, y=y, hue=hue, row=row, col=col, data=df, estimator=aggregation_fn, kind=kind, 
+                                margin_titles=True, height=4)
+                    im = figure_to_pillow_image(fig)
+                    images.append(im)
 
-                fig = sns.catplot(x=x, y=y, hue=hue, row=row, col=col, data=df, estimator=aggregation_fn, kind=kind, 
-                            margin_titles=True, height=4)
-                return fig_to_html(fig)
+                image = stack_images(images)
+                base64_image = image_to_base64(image)
+                html = BASE64_HTML_TAG.format(base64_image)
+                return html
 
             else:
                 raise ValueError('Invalid kind: {}'.format(kind))
 
         except Exception as e:
+            traceback.print_exc()
             return cgi.escape(get_class_name(e) + ': ' + str(e)), 400
 
     app.run(host=host, port=port, debug=True)
+
+
+def figure_to_pillow_image(fig):
+    buffer = io.BytesIO()
+    fig.savefig(buffer, format='png')
+    im = Image.open(buffer)
+    return im
+
+
+def stack_images(images):
+    numpy_images = [np.asarray(image) for image in images]
+
+    new_height = sum(height(image) for image in numpy_images)
+    new_width = max(width(image) for image in numpy_images)
+    num_channels = numpy_images[0].shape[2]
+
+    new_shape = (new_height, new_width, num_channels)
+    stacked_image = np.ones(new_shape, dtype=numpy_images[0].dtype)
+
+    y_offset = 0
+    for image in numpy_images:
+        stacked_image[y_offset:y_offset+height(image), :width(image), :] = image
+        y_offset += height(image)
+
+    return Image.fromarray(stacked_image)
+
+
+def height(image):
+    return image.shape[0]
+
+
+def width(image):
+    return image.shape[1]
+
+
+def image_to_base64(image):
+    buffered = io.BytesIO()
+    image.save(buffered, format="png")
+    image_bytes = base64.b64encode(buffered.getvalue())
+    image_string = image_bytes.decode('utf-8')
+
+    return image_string
 
 
 def dtype_to_type(dtype):
