@@ -150,8 +150,25 @@ def dashboard(host=None, port=None, df=None):
 
                 images = []
                 for y in values:
-                    fig = sns.relplot(x=x, y=y, hue=color, size=size, style=shape, row=row, col=col, data=df, estimator=aggregation_fn, kind=kind, 
+                    fig = sns.relplot(x=x, y=y, hue=color, size=size, style=shape, row=row, col=col, data=df, kind=kind, 
                                     height=4)
+                    im = figure_to_pillow_image(fig)
+                    images.append(im)
+
+                image = stack_images(images)
+                base64_image = image_to_base64(image)
+                html = BASE64_HTML_TAG.format(base64_image)
+                return html
+
+            elif plot_group == 'regplot':
+                x = xaxis[0]
+                color = colors[0] if colors else None
+                row = rows[0] if rows else None
+                col = columns[0] if columns else None
+
+                images = []
+                for y in values:
+                    fig = sns.lmplot(x=x, y=y, hue=color, row=row, col=col, data=df, height=4)
                     im = figure_to_pillow_image(fig)
                     images.append(im)
 

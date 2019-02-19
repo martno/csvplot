@@ -28,6 +28,15 @@ var LIMITS_BY_CATEGORY = {
         'xaxis': {'min': 1, 'max': 1},
         'shapes': {'min': 0, 'max': 1},
         'sizes': {'min': 0, 'max': 1}
+    },
+    'regplot': {
+        'rows': {'min': 0, 'max': 1},
+        'columns': {'min': 0, 'max': 1},
+        'values': {'min': 1, 'max': Infinity},
+        'colors': {'min': 0, 'max': 1},
+        'xaxis': {'min': 1, 'max': 1},
+        'shapes': {'min': 0, 'max': 0},
+        'sizes': {'min': 0, 'max': 0}
     }
 };
 
