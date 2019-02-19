@@ -94,6 +94,10 @@ def dashboard(host=None, port=None, df=None):
             rows = fields['rows']
             columns = fields['columns']
             values = fields['values']
+            colors = fields['colors']
+            xaxis = fields['xaxis']
+            shapes = fields['shapes']
+            sizes = fields['sizes']
 
             if plot_group == 'pivot':
                 pivot_df = pd.pivot_table(df, values=values, index=rows, 
@@ -136,8 +140,28 @@ def dashboard(host=None, port=None, df=None):
                 html = BASE64_HTML_TAG.format(base64_image)
                 return html
 
+            elif plot_group == 'relative-plot':
+                x = xaxis[0]
+                color = colors[0] if colors else None
+                shape = shapes[0] if shapes else None
+                size = sizes[0] if sizes else None
+                row = rows[0] if rows else None
+                col = columns[0] if columns else None
+
+                images = []
+                for y in values:
+                    fig = sns.relplot(x=x, y=y, hue=color, size=size, style=shape, row=row, col=col, data=df, estimator=aggregation_fn, kind=kind, 
+                                    height=4)
+                    im = figure_to_pillow_image(fig)
+                    images.append(im)
+
+                image = stack_images(images)
+                base64_image = image_to_base64(image)
+                html = BASE64_HTML_TAG.format(base64_image)
+                return html
+
             else:
-                raise ValueError('Invalid kind: {}'.format(kind))
+                raise ValueError('Invalid plot_group: {}'.format(plot_group))
 
         except Exception as e:
             traceback.print_exc()

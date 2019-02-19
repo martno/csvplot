@@ -5,14 +5,41 @@ var LIMITS_BY_CATEGORY = {
     'pivot': {
         'rows': {'min': 0, 'max': Infinity},
         'columns': {'min': 0, 'max': Infinity},
-        'values': {'min': 0, 'max': Infinity}
+        'values': {'min': 0, 'max': Infinity},
+        'colors': {'min': 0, 'max': 0},
+        'xaxis': {'min': 0, 'max': 0},
+        'shapes': {'min': 0, 'max': 0},
+        'sizes': {'min': 0, 'max': 0}
     },
     'category-plot': {
         'rows': {'min': 0, 'max': 1},
         'columns': {'min': 1, 'max': 3},
-        'values': {'min': 1, 'max': Infinity}
+        'values': {'min': 1, 'max': Infinity},
+        'colors': {'min': 0, 'max': 0},
+        'xaxis': {'min': 0, 'max': 0},
+        'shapes': {'min': 0, 'max': 0},
+        'sizes': {'min': 0, 'max': 0}
+    },
+    'relative-plot': {
+        'rows': {'min': 0, 'max': 1},
+        'columns': {'min': 0, 'max': 1},
+        'values': {'min': 1, 'max': Infinity},
+        'colors': {'min': 0, 'max': 1},
+        'xaxis': {'min': 1, 'max': 1},
+        'shapes': {'min': 0, 'max': 1},
+        'sizes': {'min': 0, 'max': 1}
     }
 };
+
+var FIELD_NAMES = [
+    'rows',
+    'columns',
+    'values',
+    'colors',
+    'xaxis',
+    'shapes',
+    'sizes'
+]
 
 
 $(document).ready(function() {
@@ -53,7 +80,7 @@ $(document).ready(function() {
 
     $('#apply').click(function() {
         var fieldData = {};
-        for (let variable of ['columns', 'rows', 'values']) {
+        for (let variable of FIELD_NAMES) {
             var fields = [];
             for (let child of $('#field-' + variable).children('div').toArray()) {
                 if (!$(child).hasClass('transparent')) {
@@ -94,7 +121,7 @@ $(document).ready(function() {
 function updateFields() {
     $('.collection').find('.field').removeClass('transparent');
 
-    for (let container of ['rows', 'columns', 'values']) {
+    for (let container of FIELD_NAMES) {
         var fields = $(`#field-${container}`).find('.field').toArray();
 
         var plotCategory = getSelectedRadioButton('#field-form', 'plot-category');

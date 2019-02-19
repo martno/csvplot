@@ -61,6 +61,32 @@
           </div>
         </div>
 
+        <div class='row'>
+          <div class='col'>
+            Color
+            <span id='colors-display' class='badge category' data-toggle="tooltip" title="Required number of fields"></span>
+            <div id='field-colors' class="collection category"></div>
+          </div>
+          <div class='col'>
+            X axis
+            <span id='xaxis-display' class='badge number' data-toggle="tooltip" title="Required number of fields"></span>
+            <div id='field-xaxis' class="collection number"></div>
+          </div>
+        </div>
+
+        <div class='row'>
+          <div class='col'>
+            Shape
+            <span id='shapes-display' class='badge category' data-toggle="tooltip" title="Required number of fields"></span>
+            <div id='field-shapes' class="collection category"></div>
+          </div>
+          <div class='col'>
+            Size
+            <span id='sizes-display' class='badge number' data-toggle="tooltip" title="Required number of fields"></span>
+            <div id='field-sizes' class="collection number"></div>
+          </div>
+        </div>
+
         <form id='field-form'>
           Aggregate:
           <select name='aggregate' class="form-control">
@@ -89,6 +115,7 @@
               </div>
             </div>
           </div>
+
           <div class="card m-1">
             <div class="card-header p-1">
               Category plots
@@ -126,6 +153,27 @@
               </div>
             </div>
           </div>
+
+          <div class="card m-1">
+            <div class="card-header p-1">
+              Relative plots
+            </div>
+            <div class='p-1'>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="plot-category" id="plot--scatter-plot" value="relative-plot--scatter">
+                <label class="form-check-label" for="plot--scatter-plot">
+                  Scatter plot
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="plot-category" id="plot--line-plot" value="relative-plot--line">
+                <label class="form-check-label" for="plot--line-plot">
+                  Line plot
+                </label>
+              </div>
+            </div>
+          </div>
+
         </form>
 
         <br>
