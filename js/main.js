@@ -5,7 +5,7 @@ var LIMITS_BY_CATEGORY = {
     'pivot': {
         'rows': {'min': 0, 'max': Infinity},
         'columns': {'min': 0, 'max': Infinity},
-        'values': {'min': 0, 'max': Infinity},
+        'values': {'min': 1, 'max': Infinity},
         'colors': {'min': 0, 'max': 0},
         'xaxis': {'min': 0, 'max': 0},
         'shapes': {'min': 0, 'max': 0},
