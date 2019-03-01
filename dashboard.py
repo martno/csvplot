@@ -102,6 +102,10 @@ def dashboard(host=None, port=None, df=None):
             if plot_group == 'pivot':
                 pivot_df = pd.pivot_table(df, values=values, index=rows, 
                                           columns=columns, aggfunc=aggregation_fn)
+                
+                if isinstance(pivot_df, pd.Series):
+                    pivot_df = pivot_df.to_frame().T
+
                 if kind == 'pivot-table':
                     table = to_html_table(pivot_df)
                     return table
