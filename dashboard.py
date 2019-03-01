@@ -85,7 +85,11 @@ def dashboard(host=None, port=None, df=None):
             
             pprint(form_dict)
 
-            aggregation_fn  = FUNC_BY_AGGREGATE[form_dict['aggregate']]
+            aggregation_fn = FUNC_BY_AGGREGATE[form_dict['aggregate']]
+
+            facet_width = float(form_dict['facet-width'])
+            facet_height = float(form_dict['facet-height'])
+            aspect_ratio = facet_width / facet_height
 
             plot_category = form_dict['plot-category']
             plot_group, kind = plot_category.split('--')
@@ -135,7 +139,7 @@ def dashboard(host=None, port=None, df=None):
                 images = []
                 for y in values:
                     fig = sns.catplot(x=x, y=y, hue=hue, row=row, col=col, data=df, estimator=aggregation_fn, kind=kind, 
-                                margin_titles=True, height=4)
+                                margin_titles=True, height=facet_height, aspect=aspect_ratio)
                     im = figure_to_pillow_image(fig)
                     images.append(im)
 
@@ -155,7 +159,7 @@ def dashboard(host=None, port=None, df=None):
                 images = []
                 for y in values:
                     fig = sns.relplot(x=x, y=y, hue=color, size=size, style=shape, row=row, col=col, data=df, kind=kind, 
-                                    height=4)
+                                      height=facet_height, aspect=aspect_ratio)
                     im = figure_to_pillow_image(fig)
                     images.append(im)
 
@@ -172,7 +176,7 @@ def dashboard(host=None, port=None, df=None):
 
                 images = []
                 for y in values:
-                    fig = sns.lmplot(x=x, y=y, hue=color, row=row, col=col, data=df, height=4)
+                    fig = sns.lmplot(x=x, y=y, hue=color, row=row, col=col, data=df, height=facet_height, aspect=aspect_ratio)
                     im = figure_to_pillow_image(fig)
                     images.append(im)
 
@@ -190,7 +194,7 @@ def dashboard(host=None, port=None, df=None):
     
                 data = pd.concat((data, df[colors]), axis='columns')
 
-                g = sns.PairGrid(data, hue=color)
+                g = sns.PairGrid(data, hue=color, height=facet_height, aspect=aspect_ratio)
                 g = g.map_diag(plt.hist)
                 g = g.map_upper(sns.kdeplot)
                 g = g.map_lower(sns.scatterplot)
@@ -206,7 +210,7 @@ def dashboard(host=None, port=None, df=None):
 
                 images = []
                 for y in values:
-                    g = sns.JointGrid(x=x, y=y, data=df)
+                    g = sns.JointGrid(x=x, y=y, data=df, height=facet_height, aspect=aspect_ratio)
                     g = g.plot_joint(sns.scatterplot)
                     g = g.plot_marginals(sns.distplot)
 
