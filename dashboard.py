@@ -176,6 +176,43 @@ def dashboard(host=None, port=None, df=None):
                 base64_image = image_to_base64(image)
                 html = BASE64_HTML_TAG.format(base64_image)
                 return html
+            
+            elif plot_group == 'pair-plot':
+                color = colors[0] if colors else None
+
+                print(values)
+
+                data = df[values].fillna(0)  # TODO: drop n/a instead
+    
+                data = pd.concat((data, df[colors]), axis='columns')
+
+                g = sns.PairGrid(data, hue=color)
+                g = g.map_diag(plt.hist)
+                g = g.map_upper(sns.kdeplot)
+                g = g.map_lower(sns.scatterplot)
+                g = g.add_legend()
+
+                im = figure_to_pillow_image(g)
+                base64_image = image_to_base64(im)
+                html = BASE64_HTML_TAG.format(base64_image)
+                return html
+
+            elif plot_group == 'joint-plot':
+                x = xaxis[0]
+
+                images = []
+                for y in values:
+                    g = sns.JointGrid(x=x, y=y, data=df)
+                    g = g.plot_joint(sns.scatterplot)
+                    g = g.plot_marginals(sns.distplot)
+
+                    im = figure_to_pillow_image(g)
+                    images.append(im)
+
+                image = stack_images(images)
+                base64_image = image_to_base64(image)
+                html = BASE64_HTML_TAG.format(base64_image)
+                return html
 
             else:
                 raise ValueError('Invalid plot_group: {}'.format(plot_group))
