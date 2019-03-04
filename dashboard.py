@@ -38,6 +38,9 @@ CATEGORY_PLOTS = {
 }
 
 
+sns.set()  # Set Seaborn default styles
+
+
 @click.command()
 @click.option('--host', default='127.0.0.1', show_default=True, 
               help="The hostname to listen on. Set this to '0.0.0.0' to have the server available externally as well")
