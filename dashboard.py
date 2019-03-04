@@ -94,6 +94,9 @@ def dashboard(host=None, port=None, df=None):
             facet_height = float(form_dict['facet-height'])
             aspect_ratio = facet_width / facet_height
 
+            plot_style = form_dict['plot-style']
+            sns.set_style(plot_style)
+
             plot_category = form_dict['plot-category']
             plot_group, kind = plot_category.split('--')
 

@@ -88,7 +88,7 @@
         </div>
 
         <form id='field-form'>
-          Aggregate:
+          Aggregate
           <select name='aggregate' class="form-control">
             <option value='average'>Average</option>
             <option value='sum'>Sum</option>
@@ -199,18 +199,36 @@
               </div>
             </div>
           </div>
-          
-          <div class='row'>
-            <div class='col'>
-              Facet width
-              <input class='form-control' type='text' value='4' name='facet-width'>
+
+          <hr>
+
+          <div class="card m-1">
+            <div class="card-header p-1">
+              Visuals
             </div>
-            <div class='col'>
-              Facet height
-              <input class='form-control' type='text' value='4' name='facet-height'>
+            <div class='p-1'>
+              <div class='row'>
+                <div class='col'>
+                  Facet width
+                  <input class='form-control' type='text' value='4' name='facet-width'>
+                </div>
+                <div class='col'>
+                  Facet height
+                  <input class='form-control' type='text' value='4' name='facet-height'>
+                </div>
+              </div>
+
+              Style
+              <select name='plot-style' class="form-control">
+                <option value='darkgrid'>Dark grid</option>
+                <option value='whitegrid'>White grid</option>
+                <option value='dark'>Dark</option>
+                <option value='white'>White</option>
+                <option value='ticks'>Ticks</option>
+              </select>
             </div>
           </div>
-            
+
         </form>
 
         <br>
