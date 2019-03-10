@@ -137,9 +137,11 @@ $(document).ready(function() {
 
     $('input[type=radio][name=plot-category]').change(function() {
         updateFields();
+        updatePlotOptions();
     });
 
     updateFields();
+    updatePlotOptions();
 
     enableTooltips();
 });
@@ -163,6 +165,14 @@ function updateFields() {
         var rangeString = rangeToString(range);
         $(`#${container}-display`).html(rangeString);
     }
+}
+
+
+function updatePlotOptions() {
+    $('.plot-option').hide();
+
+    var plotCategory = getSelectedRadioButton('#field-form', 'plot-category');
+    $('#' + plotCategory).show();
 }
 
 
@@ -198,6 +208,10 @@ function rangeToString(range) {
     var max = range.max;
     if (max === Infinity) {
         max = '&infin;';
+    }
+
+    if (max === 0) {
+        return 'Disabled';
     }
 
     if (min === max) {

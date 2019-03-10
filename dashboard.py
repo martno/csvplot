@@ -121,8 +121,10 @@ def dashboard(host=None, port=None, df=None):
                     return table
 
                 elif kind == 'heatmap':
+                    square = 'heatmap-square' in form_dict
+                    show_values = 'heatmap-annotate' in form_dict
                     plt.figure()  # Reset figure
-                    fig = sns.heatmap(pivot_df, annot=True).get_figure()
+                    fig = sns.heatmap(pivot_df, annot=show_values, square=square).get_figure()
                     return fig_to_html(fig)
 
                 else:
@@ -142,11 +144,26 @@ def dashboard(host=None, port=None, df=None):
 
                 row = rows[0] if rows else None
 
+                kwargs = {}
+                if kind == 'strip':
+                    kwargs = {
+                        'alpha': float(form_dict['strip-plot-alpha']),
+                        'dodge': 'strip-plot-dodge' in  form_dict,
+                    }
+                elif kind == 'box':
+                    if 'box-plot-enhance' in  form_dict:
+                        kind = 'boxen'
+                elif kind == 'violin':
+                    kwargs = {
+                        'inner': form_dict['violin-inner'],
+                        'split': 'violin-plot-split' in form_dict,
+                    }
+
                 images = []
                 for y in values:
-                    fig = sns.catplot(x=x, y=y, hue=hue, row=row, col=col, data=df, estimator=aggregation_fn, kind=kind, 
-                                margin_titles=True, height=facet_height, aspect=aspect_ratio)
-                    im = figure_to_pillow_image(fig)
+                    g = sns.catplot(x=x, y=y, hue=hue, row=row, col=col, data=df, estimator=aggregation_fn, kind=kind, 
+                                    margin_titles=True, height=facet_height, aspect=aspect_ratio, **kwargs)
+                    im = figure_to_pillow_image(g)
                     images.append(im)
 
                 image = stack_images(images)
@@ -162,11 +179,17 @@ def dashboard(host=None, port=None, df=None):
                 row = rows[0] if rows else None
                 col = columns[0] if columns else None
 
+                kwargs = {}
+                if kind == 'scatter':
+                    kwargs = {
+                        'alpha': float(form_dict['scatter-alpha']),
+                    }
+
                 images = []
                 for y in values:
-                    fig = sns.relplot(x=x, y=y, hue=color, size=size, style=shape, row=row, col=col, data=df, kind=kind, 
-                                      height=facet_height, aspect=aspect_ratio)
-                    im = figure_to_pillow_image(fig)
+                    g = sns.relplot(x=x, y=y, hue=color, size=size, style=shape, row=row, col=col, data=df, kind=kind, 
+                                      height=facet_height, aspect=aspect_ratio, facet_kws={'margin_titles' : True}, **kwargs)
+                    im = figure_to_pillow_image(g)
                     images.append(im)
 
                 image = stack_images(images)
@@ -180,9 +203,11 @@ def dashboard(host=None, port=None, df=None):
                 row = rows[0] if rows else None
                 col = columns[0] if columns else None
 
+                order = int(form_dict['regplot-order'])
+
                 images = []
                 for y in values:
-                    fig = sns.lmplot(x=x, y=y, hue=color, row=row, col=col, data=df, height=facet_height, aspect=aspect_ratio)
+                    fig = sns.lmplot(x=x, y=y, hue=color, row=row, col=col, data=df, height=facet_height, aspect=aspect_ratio, order=order)
                     im = figure_to_pillow_image(fig)
                     images.append(im)
 
@@ -200,10 +225,24 @@ def dashboard(host=None, port=None, df=None):
     
                 data = pd.concat((data, df[colors]), axis='columns')
 
+                pair_plot_diag = form_dict['pair-plot-diag']
+                pair_plot_upper = form_dict['pair-plot-upper']
+                pair_plot_lower = form_dict['pair-plot-lower']
+
+                diag_fn_by_key = {
+                    'hist': plt.hist, 
+                    'kde': sns.kdeplot,
+                }
+
+                off_diag_fn_by_key = {
+                    'scatter': sns.scatterplot,
+                    'kde': sns.kdeplot,
+                }
+
                 g = sns.PairGrid(data, hue=color, height=facet_height, aspect=aspect_ratio)
-                g = g.map_diag(plt.hist)
-                g = g.map_upper(sns.kdeplot)
-                g = g.map_lower(sns.scatterplot)
+                g = g.map_diag(diag_fn_by_key[pair_plot_diag])
+                g = g.map_upper(off_diag_fn_by_key[pair_plot_upper])
+                g = g.map_lower(off_diag_fn_by_key[pair_plot_lower])
                 g = g.add_legend()
 
                 im = figure_to_pillow_image(g)
@@ -214,11 +253,22 @@ def dashboard(host=None, port=None, df=None):
             elif plot_group == 'joint-plot':
                 x = xaxis[0]
 
+                joint_kind = form_dict['joint-plot-kind']
+
+                fn_by_joint_kind = {
+                    'scatter': sns.scatterplot,
+                    'reg': sns.regplot,
+                    'kde': sns.kdeplot,
+                }
+
+                use_hist = 'joint-plot-hist' in form_dict
+                use_kde = 'joint-plot-kde' in form_dict
+
                 images = []
                 for y in values:
-                    g = sns.JointGrid(x=x, y=y, data=df, height=facet_height, aspect=aspect_ratio)
-                    g = g.plot_joint(sns.scatterplot)
-                    g = g.plot_marginals(sns.distplot)
+                    g = sns.JointGrid(x=x, y=y, data=df, height=facet_height)
+                    g = g.plot_joint(fn_by_joint_kind[joint_kind])
+                    g = g.plot_marginals(sns.distplot, hist=use_hist, kde=use_kde)
 
                     im = figure_to_pillow_image(g)
                     images.append(im)
@@ -289,7 +339,7 @@ def dtype_to_type(dtype):
 def form_data_to_dict(form_data):
     form_items = form_data.split('&')
     form_items = [item.split('=') for item in form_items]
-    form_dict = {key: value for key, value in form_items}
+    form_dict = {key: value if value != 'null' else None for key, value in form_items}
 
     return form_dict
 
