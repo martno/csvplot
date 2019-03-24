@@ -59,6 +59,8 @@ def main(host, port, csv, excel):
         elif excel is not None:
             df = pd.read_excel(excel)
             name = Path(excel).name
+        else:
+            assert False
     
     dashboard(host, port, df, name)
 
