@@ -22,361 +22,369 @@
 <body>
   <div style="margin: 10px">
     <div class="row">
-      <div class="sidebar">
-        <h2>CSV Plot</h2>
-
-        <div class="card m-1">
-          <div class="card-header p-1">
-            Fields
-          </div>
-          <div class='p-1'>
-  
-            <div class='row'>
-              <div class='col'>
-                Categories
-                <div id='field-categories' class="collection category"></div>
-              </div>
-              <div class='col'>
-                Numbers
-                <div id='field-numbers' class="collection number"></div>
-              </div>
-            </div>
-
-            <div class='row'>
-              <div class='col'>
-              </div>
-              <div class='col'>
-                Columns
-                <span id='columns-display' class='badge category' data-toggle="tooltip" title="Required number of fields"></span>
-                <div id='field-columns' class="collection category"></div>
-              </div>
-            </div>
-
-            <div class='row'>
-              <div class='col'>
-                Rows
-                <span id='rows-display' class='badge category' data-toggle="tooltip" title="Required number of fields"></span>
-                <div id='field-rows' class="collection category"></div>
-              </div>
-              <div class='col'>
-                Values
-                <span id='values-display' class='badge number' data-toggle="tooltip" title="Required number of fields"></span>
-                <div id='field-values' class="collection number"></div>
-              </div>
-            </div>
+      <div class="row">
+        <div class="sidebar">
+          <div>
+            <h2>CSV Plot</h2>
 
             <div class="card m-1">
               <div class="card-header p-1">
-                Relative fields
+                Fields
               </div>
               <div class='p-1'>
+      
                 <div class='row'>
                   <div class='col'>
-                    Color
-                    <span id='colors-display' class='badge category' data-toggle="tooltip" title="Required number of fields"></span>
-                    <div id='field-colors' class="collection category"></div>
+                    Categories
+                    <div id='field-categories' class="collection category"></div>
                   </div>
                   <div class='col'>
-                    X axis
-                    <span id='xaxis-display' class='badge number' data-toggle="tooltip" title="Required number of fields"></span>
-                    <div id='field-xaxis' class="collection number"></div>
+                    Numbers
+                    <div id='field-numbers' class="collection number"></div>
                   </div>
                 </div>
 
                 <div class='row'>
                   <div class='col'>
-                    Shape
-                    <span id='shapes-display' class='badge category' data-toggle="tooltip" title="Required number of fields"></span>
-                    <div id='field-shapes' class="collection category"></div>
                   </div>
                   <div class='col'>
-                    Size
-                    <span id='sizes-display' class='badge number' data-toggle="tooltip" title="Required number of fields"></span>
-                    <div id='field-sizes' class="collection number"></div>
+                    Columns
+                    <span id='columns-display' class='badge category' data-toggle="tooltip" title="Required number of fields"></span>
+                    <div id='field-columns' class="collection category"></div>
+                  </div>
+                </div>
+
+                <div class='row'>
+                  <div class='col'>
+                    Rows
+                    <span id='rows-display' class='badge category' data-toggle="tooltip" title="Required number of fields"></span>
+                    <div id='field-rows' class="collection category"></div>
+                  </div>
+                  <div class='col'>
+                    Values
+                    <span id='values-display' class='badge number' data-toggle="tooltip" title="Required number of fields"></span>
+                    <div id='field-values' class="collection number"></div>
+                  </div>
+                </div>
+
+                <div class="card m-1">
+                  <div class="card-header p-1">
+                    Relative fields
+                  </div>
+                  <div class='p-1'>
+                    <div class='row'>
+                      <div class='col'>
+                        Color
+                        <span id='colors-display' class='badge category' data-toggle="tooltip" title="Required number of fields"></span>
+                        <div id='field-colors' class="collection category"></div>
+                      </div>
+                      <div class='col'>
+                        X axis
+                        <span id='xaxis-display' class='badge number' data-toggle="tooltip" title="Required number of fields"></span>
+                        <div id='field-xaxis' class="collection number"></div>
+                      </div>
+                    </div>
+
+                    <div class='row'>
+                      <div class='col'>
+                        Shape
+                        <span id='shapes-display' class='badge category' data-toggle="tooltip" title="Required number of fields"></span>
+                        <div id='field-shapes' class="collection category"></div>
+                      </div>
+                      <div class='col'>
+                        Size
+                        <span id='sizes-display' class='badge number' data-toggle="tooltip" title="Required number of fields"></span>
+                        <div id='field-sizes' class="collection number"></div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
 
-        <form id='field-form'>
+            <form id='field-form'>
 
-          <!-- form-check: a single class for both input types that improves the layout and behavior of their HTML elements -->
-          <div class="card m-1">
-            <div class="card-header p-1">
-              Plots
-            </div>
-            <div class='p-1'>
+              <!-- form-check: a single class for both input types that improves the layout and behavior of their HTML elements -->
+              <div class="card m-1">
+                <div class="card-header p-1">
+                  Plots
+                </div>
+                <div class='p-1'>
 
-              <b>Pivot</b>
-              <div class="form-check">
-                <input class="form-check-input" type="radio" name="plot-category" id="plot--pivot-table" value="pivot--pivot-table"
-                  checked>
-                <label class="form-check-label" for="plot--pivot-table">
-                  Pivot table
-                </label>
-              </div>
-              <div class="form-check">
-                <input class="form-check-input" type="radio" name="plot-category" id="plot--heatmap" value="pivot--heatmap">
-                <label class="form-check-label" for="plot--heatmap">
-                  Heatmap
-                </label>
+                  <b>Pivot</b>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="plot-category" id="plot--pivot-table" value="pivot--pivot-table"
+                      checked>
+                    <label class="form-check-label" for="plot--pivot-table">
+                      Pivot table
+                    </label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="plot-category" id="plot--heatmap" value="pivot--heatmap">
+                    <label class="form-check-label" for="plot--heatmap">
+                      Heatmap
+                    </label>
+                  </div>
+
+                  <b>Category plots</b>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="plot-category" id="plot--bar-plot" value="category-plot--bar">
+                    <label class="form-check-label" for="plot--bar-plot">
+                      Bar plot
+                    </label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="plot-category" id="plot--strip-plot" value="category-plot--strip">
+                    <label class="form-check-label" for="plot--strip-plot">
+                      Strip plot
+                    </label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="plot-category" id="plot--box-plot" value="category-plot--box">
+                    <label class="form-check-label" for="plot--box-plot">
+                      Box plot
+                    </label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="plot-category" id="plot--violin-plot" value="category-plot--violin">
+                    <label class="form-check-label" for="plot--violin-plot">
+                      Violin plot
+                    </label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="plot-category" id="plot--point-plot" value="category-plot--point">
+                    <label class="form-check-label" for="plot--point-plot">
+                      Point plot
+                    </label>
+                  </div>
+
+                  <b>Relative plots</b>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="plot-category" id="plot--scatter-plot" value="relative-plot--scatter">
+                    <label class="form-check-label" for="plot--scatter-plot">
+                      Scatter plot
+                    </label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="plot-category" id="plot--line-plot" value="relative-plot--line">
+                    <label class="form-check-label" for="plot--line-plot">
+                      Line plot
+                    </label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="plot-category" id="plot--reg-plot" value="regplot--regplot">
+                    <label class="form-check-label" for="plot--reg-plot">
+                      Linear regression
+                    </label>
+                  </div>
+
+                  <b>Other</b>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="plot-category" id="plot--pair-plot" value="pair-plot--pair-plot">
+                    <label class="form-check-label" for="plot--pair-plot">
+                      Pair plot
+                    </label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="plot-category" id="plot--joint-plot" value="joint-plot--joint-plot">
+                    <label class="form-check-label" for="plot--joint-plot">
+                      Joint plot
+                    </label>
+                  </div>
+                </div>
               </div>
 
-              <b>Category plots</b>
-              <div class="form-check">
-                <input class="form-check-input" type="radio" name="plot-category" id="plot--bar-plot" value="category-plot--bar">
-                <label class="form-check-label" for="plot--bar-plot">
-                  Bar plot
-                </label>
-              </div>
-              <div class="form-check">
-                <input class="form-check-input" type="radio" name="plot-category" id="plot--strip-plot" value="category-plot--strip">
-                <label class="form-check-label" for="plot--strip-plot">
-                  Strip plot
-                </label>
-              </div>
-              <div class="form-check">
-                <input class="form-check-input" type="radio" name="plot-category" id="plot--box-plot" value="category-plot--box">
-                <label class="form-check-label" for="plot--box-plot">
-                  Box plot
-                </label>
-              </div>
-              <div class="form-check">
-                <input class="form-check-input" type="radio" name="plot-category" id="plot--violin-plot" value="category-plot--violin">
-                <label class="form-check-label" for="plot--violin-plot">
-                  Violin plot
-                </label>
-              </div>
-              <div class="form-check">
-                <input class="form-check-input" type="radio" name="plot-category" id="plot--point-plot" value="category-plot--point">
-                <label class="form-check-label" for="plot--point-plot">
-                  Point plot
-                </label>
+              <div class="card m-1">
+                <div class="card-header p-1">
+                  Plot options
+                </div>
+                <div class='p-1'>
+
+                  <div id="pivot--heatmap" class='plot-option'>
+                    <div class="form-group form-check">
+                      <input type="checkbox" class="form-check-input" id="heatmap-square" name="heatmap-square" value="true">
+                      <label class="form-check-label" for="heatmap-square">Square</label>
+                      <br>
+                      <input type="checkbox" class="form-check-input" id="heatmap-annotate" name="heatmap-annotate" value="true">
+                      <label class="form-check-label" for="heatmap-annotate">Show values</label>
+                    </div>
+                  </div>
+
+                  <div id="relative-plot--scatter" class='plot-option'>
+                    Opacity
+                    <input class='form-control' type='text' value='1' name='scatter-alpha'>
+                  </div>
+
+                  <div id="category-plot--strip" class='plot-option'>
+                    Opacity
+                    <input class='form-control' type='text' value='1' name='strip-plot-alpha'>
+
+                    <div class="form-group form-check">
+                      <input type="checkbox" class="form-check-input" id="strip-plot-dodge" name="strip-plot-dodge" value="true">
+                      <label class="form-check-label" for="strip-plot-dodge">Dodge</label>
+                    </div>
+                  </div>
+
+                  <div id="category-plot--box" class='plot-option'>
+                    <div class="form-group form-check">
+                      <input type="checkbox" class="form-check-input" id="box-plot-enhance" name="box-plot-enhance" value="true">
+                      <label class="form-check-label" for="box-plot-enhance">Enhanced</label>
+                    </div>
+                  </div>
+
+                  <div id="category-plot--violin" class='plot-option'>
+                    Inner
+                    <select name='violin-inner' class="form-control">
+                      <option value='box'>Box</option>
+                      <option value='quartile'>Quartile</option>
+                      <option value='point'>Point</option>
+                      <option value='stick'>Stick</option>
+                      <option value=null>None</option>
+                    </select>
+
+                    <div class="form-group form-check">
+                      <input type="checkbox" class="form-check-input" id="violin-plot-split" name="violin-plot-split" value="true">
+                      <label class="form-check-label" for="violin-plot-split">Split</label>
+                    </div>
+                  </div>
+
+                  <div id="regplot--regplot" class='plot-option'>
+                    Order
+                    <input class='form-control' type='text' value='1' name='regplot-order'>
+                  </div>
+
+                  <div id="joint-plot--joint-plot" class='plot-option'>
+                    Joint kind
+                    <select name='joint-plot-kind' class="form-control">
+                      <option value='scatter'>Scatter</option>
+                      <option value='reg'>Linear regression</option>
+                      <option value='kde'>KDE</option>
+                    </select>
+
+                    <br>
+
+                    Marginals
+                    <div class="form-group form-check">
+                      <input type="checkbox" class="form-check-input" id="joint-plot-hist" name="joint-plot-hist" value="true" checked>
+                      <label class="form-check-label" for="joint-plot-hist">Histogram</label>
+                      <br>
+                      <input type="checkbox" class="form-check-input" id="joint-plot-kde" name="joint-plot-kde" value="true" checked>
+                      <label class="form-check-label" for="joint-plot-kde">KDE</label>
+                    </div>
+                  </div>
+
+                  <div id="pair-plot--pair-plot" class='plot-option'>
+                    Upper
+                    <select name='pair-plot-upper' class="form-control">
+                      <option value='scatter'>Scatter</option>
+                      <option value='kde'>KDE</option>
+                    </select>
+
+                    Diagonal
+                    <select name='pair-plot-diag' class="form-control">
+                      <option value='hist'>Histogram</option>
+                      <option value='kde'>KDE</option>
+                    </select>
+
+                    Lower
+                    <select name='pair-plot-lower' class="form-control">
+                      <option value='scatter'>Scatter</option>
+                      <option value='kde'>KDE</option>
+                    </select>
+                  </div>
+
+                </div>
               </div>
 
-              <b>Relative plots</b>
-              <div class="form-check">
-                <input class="form-check-input" type="radio" name="plot-category" id="plot--scatter-plot" value="relative-plot--scatter">
-                <label class="form-check-label" for="plot--scatter-plot">
-                  Scatter plot
-                </label>
-              </div>
-              <div class="form-check">
-                <input class="form-check-input" type="radio" name="plot-category" id="plot--line-plot" value="relative-plot--line">
-                <label class="form-check-label" for="plot--line-plot">
-                  Line plot
-                </label>
-              </div>
-              <div class="form-check">
-                <input class="form-check-input" type="radio" name="plot-category" id="plot--reg-plot" value="regplot--regplot">
-                <label class="form-check-label" for="plot--reg-plot">
-                  Linear regression
-                </label>
-              </div>
+              <div class="card m-1">
+                <div class="card-header p-1">
+                  Common
+                </div>
+                <div class='p-1'>
+        
+                  Aggregate
+                  <select name='aggregate' class="form-control">
+                    <option value='average'>Average</option>
+                    <option value='sum'>Sum</option>
+                  </select>
 
-              <b>Other</b>
-              <div class="form-check">
-                <input class="form-check-input" type="radio" name="plot-category" id="plot--pair-plot" value="pair-plot--pair-plot">
-                <label class="form-check-label" for="plot--pair-plot">
-                  Pair plot
-                </label>
-              </div>
-              <div class="form-check">
-                <input class="form-check-input" type="radio" name="plot-category" id="plot--joint-plot" value="joint-plot--joint-plot">
-                <label class="form-check-label" for="plot--joint-plot">
-                  Joint plot
-                </label>
-              </div>
-            </div>
-          </div>
+                <div class='row'>
+                  <div class='col'>
+                    Min x
+                    <input class='form-control' type='text' value='' name='min-x'>
+                  </div>
+                  <div class='col'>
+                    Max x
+                    <input class='form-control' type='text' value='' name='max-x'>
+                  </div>
+                </div>
+                <div class='row'>
+                  <div class='col'>
+                    Min y
+                    <input class='form-control' type='text' value='' name='min-y'>
+                  </div>
+                  <div class='col'>
+                    Max y
+                    <input class='form-control' type='text' value='' name='max-y'>
+                  </div>
+                </div>
 
-          <div class="card m-1">
-            <div class="card-header p-1">
-              Plot options
-            </div>
-            <div class='p-1'>
-
-              <div id="pivot--heatmap" class='plot-option'>
                 <div class="form-group form-check">
-                  <input type="checkbox" class="form-check-input" id="heatmap-square" name="heatmap-square" value="true">
-                  <label class="form-check-label" for="heatmap-square">Square</label>
+                  <input type="checkbox" class="form-check-input" id="log-x" name="log-x" value="true">
+                  <label class="form-check-label" for="log-x">Log x</label>
                   <br>
-                  <input type="checkbox" class="form-check-input" id="heatmap-annotate" name="heatmap-annotate" value="true">
-                  <label class="form-check-label" for="heatmap-annotate">Show values</label>
+                  <input type="checkbox" class="form-check-input" id="log-y" name="log-y" value="true">
+                  <label class="form-check-label" for="log-y">Log y</label>
                 </div>
               </div>
-
-              <div id="relative-plot--scatter" class='plot-option'>
-                Opacity
-                <input class='form-control' type='text' value='1' name='scatter-alpha'>
-              </div>
-
-              <div id="category-plot--strip" class='plot-option'>
-                Opacity
-                <input class='form-control' type='text' value='1' name='strip-plot-alpha'>
-
-                <div class="form-group form-check">
-                  <input type="checkbox" class="form-check-input" id="strip-plot-dodge" name="strip-plot-dodge" value="true">
-                  <label class="form-check-label" for="strip-plot-dodge">Dodge</label>
-                </div>
-              </div>
-
-              <div id="category-plot--box" class='plot-option'>
-                <div class="form-group form-check">
-                  <input type="checkbox" class="form-check-input" id="box-plot-enhance" name="box-plot-enhance" value="true">
-                  <label class="form-check-label" for="box-plot-enhance">Enhanced</label>
-                </div>
-              </div>
-
-              <div id="category-plot--violin" class='plot-option'>
-                Inner
-                <select name='violin-inner' class="form-control">
-                  <option value='box'>Box</option>
-                  <option value='quartile'>Quartile</option>
-                  <option value='point'>Point</option>
-                  <option value='stick'>Stick</option>
-                  <option value=null>None</option>
-                </select>
-
-                <div class="form-group form-check">
-                  <input type="checkbox" class="form-check-input" id="violin-plot-split" name="violin-plot-split" value="true">
-                  <label class="form-check-label" for="violin-plot-split">Split</label>
-                </div>
-              </div>
-
-              <div id="regplot--regplot" class='plot-option'>
-                Order
-                <input class='form-control' type='text' value='1' name='regplot-order'>
-              </div>
-
-              <div id="joint-plot--joint-plot" class='plot-option'>
-                Joint kind
-                <select name='joint-plot-kind' class="form-control">
-                  <option value='scatter'>Scatter</option>
-                  <option value='reg'>Linear regression</option>
-                  <option value='kde'>KDE</option>
-                </select>
-
-                <br>
-
-                Marginals
-                <div class="form-group form-check">
-                  <input type="checkbox" class="form-check-input" id="joint-plot-hist" name="joint-plot-hist" value="true" checked>
-                  <label class="form-check-label" for="joint-plot-hist">Histogram</label>
-                  <br>
-                  <input type="checkbox" class="form-check-input" id="joint-plot-kde" name="joint-plot-kde" value="true" checked>
-                  <label class="form-check-label" for="joint-plot-kde">KDE</label>
-                </div>
-              </div>
-
-              <div id="pair-plot--pair-plot" class='plot-option'>
-                Upper
-                <select name='pair-plot-upper' class="form-control">
-                  <option value='scatter'>Scatter</option>
-                  <option value='kde'>KDE</option>
-                </select>
-
-                Diagonal
-                <select name='pair-plot-diag' class="form-control">
-                  <option value='hist'>Histogram</option>
-                  <option value='kde'>KDE</option>
-                </select>
-
-                Lower
-                <select name='pair-plot-lower' class="form-control">
-                  <option value='scatter'>Scatter</option>
-                  <option value='kde'>KDE</option>
-                </select>
-              </div>
-
             </div>
+      
+              <hr>
+
+              <div class="card m-1">
+                <div class="card-header p-1">
+                  Visuals
+                </div>
+                <div class='p-1'>
+                  <div class='row'>
+                    <div class='col'>
+                      Facet width
+                      <input class='form-control' type='text' value='4' name='facet-width'>
+                    </div>
+                    <div class='col'>
+                      Facet height
+                      <input class='form-control' type='text' value='4' name='facet-height'>
+                    </div>
+                  </div>
+
+                  Style
+                  <select name='plot-style' class="form-control">
+                    <option value='darkgrid'>Dark grid</option>
+                    <option value='whitegrid'>White grid</option>
+                    <option value='dark'>Dark</option>
+                    <option value='white'>White</option>
+                    <option value='ticks'>Ticks</option>
+                  </select>
+                </div>
+              </div>
+
+            </form>
+
+            <br>
           </div>
 
-          <div class="card m-1">
-            <div class="card-header p-1">
-              Common
-            </div>
-            <div class='p-1'>
-    
-              Aggregate
-              <select name='aggregate' class="form-control">
-                <option value='average'>Average</option>
-                <option value='sum'>Sum</option>
-              </select>
-
-            <div class='row'>
-              <div class='col'>
-                Min x
-                <input class='form-control' type='text' value='' name='min-x'>
-              </div>
-              <div class='col'>
-                Max x
-                <input class='form-control' type='text' value='' name='max-x'>
-              </div>
-            </div>
-            <div class='row'>
-              <div class='col'>
-                Min y
-                <input class='form-control' type='text' value='' name='min-y'>
-              </div>
-              <div class='col'>
-                Max y
-                <input class='form-control' type='text' value='' name='max-y'>
-              </div>
-            </div>
-
-            <div class="form-group form-check">
-              <input type="checkbox" class="form-check-input" id="log-x" name="log-x" value="true">
-              <label class="form-check-label" for="log-x">Log x</label>
-              <br>
-              <input type="checkbox" class="form-check-input" id="log-y" name="log-y" value="true">
-              <label class="form-check-label" for="log-y">Log y</label>
-            </div>
-          </div>
-        </div>
-  
-          <hr>
-
-          <div class="card m-1">
-            <div class="card-header p-1">
-              Visuals
-            </div>
-            <div class='p-1'>
-              <div class='row'>
-                <div class='col'>
-                  Facet width
-                  <input class='form-control' type='text' value='4' name='facet-width'>
-                </div>
-                <div class='col'>
-                  Facet height
-                  <input class='form-control' type='text' value='4' name='facet-height'>
-                </div>
-              </div>
-
-              Style
-              <select name='plot-style' class="form-control">
-                <option value='darkgrid'>Dark grid</option>
-                <option value='whitegrid'>White grid</option>
-                <option value='dark'>Dark</option>
-                <option value='white'>White</option>
-                <option value='ticks'>Ticks</option>
-              </select>
-            </div>
+          <div class='bottom-button'>
+            <button id="submit" class="btn btn-primary" style="width: 100%;">Submit</button>
           </div>
 
-        </form>
-
-        <br>
-        <button id="submit" class="btn btn-primary" style="width: 100%;">Submit</button>
+          </div>
       </div>
 
       <div class="content">
         <div id="main-window"></div>
       </div>
     </div>
-  </div>
+  </div>  
 
   <!-- Optional JavaScript -->
   <!-- jQuery first, then Popper.js, then Bootstrap JS -->

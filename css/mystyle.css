@@ -57,8 +57,17 @@ tr:nth-child(even) {
   bottom: 0px;
   width: 300px;
   margin-left: 10px;
+  margin-bottom: 50px;
   overflow: scroll;
+  overflow-x: hidden;
   padding: 10px;
+}
+
+.bottom-button {
+  position: fixed;
+  bottom: 0;
+  width: 286px;
+  margin: 5px;
 }
 
 .content {
