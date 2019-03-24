@@ -12,7 +12,8 @@ body {
 }
 
 .number.field {
-    background-color: rgb(93, 150, 255);
+    background-color: rgb(92, 184, 92);
+    color: white;
     margin: 5px;
     padding: 5px;
     cursor: -webkit-grab; 
@@ -22,7 +23,8 @@ body {
 }
 
 .category.field {
-  background-color: rgb(255, 93, 93);
+  background-color: rgb(2, 117, 216);
+  color: white;
   margin: 5px;
   padding: 5px;
   cursor: -webkit-grab; 
@@ -39,12 +41,14 @@ tr:nth-child(even) {
   opacity: 0.5;
 }
 
-.badge.category {
-  background-color: rgb(255, 93, 93);
+.badge.number {
+  background-color: rgb(92, 184, 92);
+  color: white;
 }
 
-.badge.number {
-  background-color: rgb(93, 150, 255);
+.badge.category {
+  background-color: rgb(2, 117, 216);
+  color: white;
 }
 
 .sidebar {
