@@ -45,17 +45,34 @@ sns.set()  # Set Seaborn default styles
 @click.option('--host', default='127.0.0.1', show_default=True, 
               help="The hostname to listen on. Set this to '0.0.0.0' to have the server available externally as well")
 @click.option('--port', default=8080, show_default=True, help="Port to listen to")
-def main(host, port):
-    df = sns.load_dataset("titanic")
-    dashboard(host, port, df)
+@click.option('--csv', help="CSV file to load")
+@click.option('--excel', help="Excel file to load")
+def main(host, port, csv, excel):
+    """Starts the CSV Plot dashboard.
+    Loads either the csv or excel file for plotting. If neither option is given, the built-in Titanic dataset is loaded"""
+
+    if csv is None and excel is None:
+        df = sns.load_dataset("titanic")
+        name = "Titanic"
+    else:
+        if csv is not None and excel is not None:
+            raise ValueError('Both --csv and --excel flags cannot be set')
+        elif csv is not None:
+            df = pd.read_csv(csv)
+            name = Path(csv).name
+        elif excel is not None:
+            df = pd.read_excel(excel)
+            name = Path(excel).name
+    
+    dashboard(host, port, df, name)
 
 
-def dashboard(host=None, port=None, df=None):
+def dashboard(host, port, df, name):
     app = Flask(__name__)
 
     @app.route('/')
     def index():
-        return render_template('index.html')
+        return render_template('index.html', name=name)
 
     @app.route('/favicon.ico')
     def favicon():
