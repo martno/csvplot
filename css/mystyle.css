@@ -8,10 +8,6 @@ body {
 }
 
 .collection {
-  background-color: rgb(207, 207, 207);
-  margin-top: 5px;
-  margin-bottom: 5px;
-  padding: 5px;
   min-height: 32px;
 }
 
@@ -55,8 +51,8 @@ tr:nth-child(even) {
   position: fixed;
   top: 0;
   bottom: 0px;
-  width: 300px;
-  margin-left: 10px;
+  width: 360px;
+  margin-left: 14px;
   margin-bottom: 50px;
   overflow: scroll;
   overflow-x: hidden;
@@ -66,10 +62,10 @@ tr:nth-child(even) {
 .bottom-button {
   position: fixed;
   bottom: 0;
-  width: 286px;
+  width: 346px;
   margin: 5px;
 }
 
 .content {
-  margin-left: 320px;
+  margin-left: 440px;
 }
