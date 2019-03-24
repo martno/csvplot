@@ -3,11 +3,7 @@ matplotlib.use('Agg')
 
 from flask import Flask, send_from_directory, request, jsonify, render_template
 from pathlib import Path
-import json
-import shutil
-import os
 import cgi
-import re
 import click
 import io
 import base64
