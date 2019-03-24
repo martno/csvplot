@@ -97,11 +97,8 @@ def dashboard(host, port, df, name):
         try:
             payload = request.json
 
-            print(payload)
-
             form_dict = form_data_to_dict(payload['formData'])
-            
-            pprint(form_dict)
+            # pprint(form_dict)
 
             aggregation_fn = FUNC_BY_AGGREGATE[form_dict['aggregate']]
 
@@ -223,7 +220,7 @@ def dashboard(host, port, df, name):
                 images = []
                 for y in values:
                     g = sns.relplot(x=x, y=y, hue=color, size=size, style=shape, row=row, col=col, data=df, kind=kind, 
-                                      height=facet_height, aspect=aspect_ratio, facet_kws={'margin_titles' : True}, **kwargs)
+                                    height=facet_height, aspect=aspect_ratio, facet_kws={'margin_titles' : True}, **kwargs)
 
                     g.set(xlim=(min_x, max_x), ylim=(min_y, max_y), xscale=x_scale, yscale=y_scale)
                                       
@@ -257,9 +254,6 @@ def dashboard(host, port, df, name):
             
             elif plot_group == 'pair-plot':
                 color = colors[0] if colors else None
-
-                print(values)
-
                 data = df[values].fillna(0)  # TODO: drop n/a instead
     
                 data = pd.concat((data, df[colors]), axis='columns')
