@@ -150,7 +150,12 @@ def dashboard(host, port, df, name):
                     show_values = 'heatmap-annotate' in form_dict
                     plt.figure()  # Reset figure
                     fig = sns.heatmap(pivot_df, annot=show_values, square=square).get_figure()
-                    return fig_to_html(fig)
+
+                    image = figure_to_pillow_image(fig)
+                    base64_image = image_to_base64(image)
+                    html = BASE64_HTML_TAG.format(base64_image)
+
+                    return html
 
                 else:
                     raise ValueError('Invalid kind: {}'.format(kind))
@@ -413,21 +418,6 @@ def table_background_gradient(s, m, M, cmap='PuBu', low=0, high=0):
     normed = norm(s.values)
     c = [colors.rgb2hex(x) for x in plt.cm.get_cmap(cmap)(normed)]
     return ['background-color: %s' % color for color in c]
-
-
-def fig_to_html(g):
-    image_string = convert_fig_to_base64(g)
-    html = BASE64_HTML_TAG.format(image_string)
-    return html
-
-
-def convert_fig_to_base64(g):
-    buffered = io.BytesIO()
-    g.savefig(buffered, format='png')
-    image_bytes = base64.b64encode(buffered.getvalue())
-    image_string = image_bytes.decode('utf-8')
-
-    return image_string
 
 
 def get_class_name(object):
