@@ -51,3 +51,16 @@ tr:nth-child(even) {
   background-color: rgb(93, 150, 255);
 }
 
+.sidebar {
+  position: fixed;
+  top: 0;
+  bottom: 0px;
+  width: 300px;
+  margin-left: 10px;
+  overflow: scroll;
+  padding: 10px;
+}
+
+.content {
+  margin-left: 320px;
+}
