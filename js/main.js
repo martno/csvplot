@@ -105,7 +105,7 @@ $(document).ready(function() {
         }
     });
 
-    $('#apply').click(function() {
+    $('#submit').click(function() {
         var fieldData = {};
         for (let variable of FIELD_NAMES) {
             var fields = [];
@@ -122,16 +122,16 @@ $(document).ready(function() {
             'formData': $('#field-form').serialize()
         };
 
-        $('#apply').attr('disabled', true);
+        $('#submit').attr('disabled', true);
 
         var promise = postJson('/getresults', json_data);
         promise.done(function(content) {
             $('#main-window').html(content);
-            $('#apply').attr('disabled', false);
+            $('#submit').attr('disabled', false);
         });
         promise.fail(function(content) {
             alert('[Error] ' + content.responseText);
-            $('#apply').attr('disabled', false);
+            $('#submit').attr('disabled', false);
         });
     });
 
