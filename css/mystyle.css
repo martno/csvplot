@@ -8,14 +8,16 @@ body {
 }
 
 .collection {
-  min-height: 32px;
+  min-height: 24px;
 }
 
 .number.field {
     background-color: rgb(92, 184, 92);
     color: white;
-    margin: 5px;
-    padding: 5px;
+    margin: 3px;
+    padding: 3px;
+    padding-left: 5px;
+    padding-right: 5px;
     cursor: -webkit-grab; 
     cursor: grab;
     font-size: 15px;
@@ -25,8 +27,10 @@ body {
 .category.field {
   background-color: rgb(2, 117, 216);
   color: white;
-  margin: 5px;
-  padding: 5px;
+  margin: 3px;
+  padding: 3px;
+  padding-left: 5px;
+  padding-right: 5px;
   cursor: -webkit-grab; 
   cursor: grab;
   font-size: 15px;
