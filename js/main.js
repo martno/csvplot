@@ -109,9 +109,10 @@ $(document).ready(function() {
         var fieldData = {};
         for (let variable of FIELD_NAMES) {
             var fields = [];
-            for (let child of $('#field-' + variable).children('div').toArray()) {
-                if (!$(child).hasClass('transparent')) {
-                    fields.push($(child).text());
+            var field_divs = $('#field-' + variable).children('div').toArray();
+            for (let field_div of field_divs) {
+                if (!$(field_div).hasClass('transparent')) {
+                    fields.push($(field_div).text());
                 }                
             }
             fieldData[variable] = fields;
@@ -168,19 +169,6 @@ function updateFields() {
 }
 
 
-function updatePlotOptions() {
-    $('.plot-option').hide();
-
-    var plotCategory = getSelectedRadioButton('#field-form', 'plot-category');
-    $('#' + plotCategory).show();
-}
-
-
-function enableTooltips() {
-    $('[data-toggle="tooltip"]').tooltip();
-}
-
-
 function getSelectedRadioButton(formId, groupName) { 
     return $(`input[name=${groupName}]:checked`, formId).val();
 }
@@ -218,6 +206,19 @@ function rangeToString(range) {
         return `${min}`;
     }
     return `${min}&rarr;${max}`
+}
+
+
+function updatePlotOptions() {
+    $('.plot-option').hide();
+
+    var plotCategory = getSelectedRadioButton('#field-form', 'plot-category');
+    $('#' + plotCategory).show();
+}
+
+
+function enableTooltips() {
+    $('[data-toggle="tooltip"]').tooltip();
 }
 
 
