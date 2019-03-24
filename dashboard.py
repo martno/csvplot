@@ -109,6 +109,18 @@ def dashboard(host=None, port=None, df=None):
             shapes = fields['shapes']
             sizes = fields['sizes']
 
+            min_x = float_from_string(form_dict['min-x'])
+            max_x = float_from_string(form_dict['max-x'])
+            if min_x is not None and max_x is not None and min_x >= max_x:
+                raise ValueError('min_x must be less than max_x')
+            min_y = float_from_string(form_dict['min-y'])
+            max_y = float_from_string(form_dict['max-y'])
+            if min_y is not None and max_y is not None and min_y >= max_y:
+                raise ValueError('min_y must be less than max_y')
+
+            x_scale = 'log' if 'log-x' in form_dict else 'linear'
+            y_scale = 'log' if 'log-y' in form_dict else 'linear'
+
             if plot_group == 'pivot':
                 pivot_df = pd.pivot_table(df, values=values, index=rows, 
                                           columns=columns, aggfunc=aggregation_fn)
@@ -163,6 +175,9 @@ def dashboard(host=None, port=None, df=None):
                 for y in values:
                     g = sns.catplot(x=x, y=y, hue=hue, row=row, col=col, data=df, estimator=aggregation_fn, kind=kind, 
                                     margin_titles=True, height=facet_height, aspect=aspect_ratio, **kwargs)
+
+                    g.set(ylim=(min_y, max_y), yscale=y_scale)
+
                     im = figure_to_pillow_image(g)
                     images.append(im)
 
@@ -189,6 +204,9 @@ def dashboard(host=None, port=None, df=None):
                 for y in values:
                     g = sns.relplot(x=x, y=y, hue=color, size=size, style=shape, row=row, col=col, data=df, kind=kind, 
                                       height=facet_height, aspect=aspect_ratio, facet_kws={'margin_titles' : True}, **kwargs)
+
+                    g.set(xlim=(min_x, max_x), ylim=(min_y, max_y), xscale=x_scale, yscale=y_scale)
+                                      
                     im = figure_to_pillow_image(g)
                     images.append(im)
 
@@ -207,8 +225,9 @@ def dashboard(host=None, port=None, df=None):
 
                 images = []
                 for y in values:
-                    fig = sns.lmplot(x=x, y=y, hue=color, row=row, col=col, data=df, height=facet_height, aspect=aspect_ratio, order=order)
-                    im = figure_to_pillow_image(fig)
+                    g = sns.lmplot(x=x, y=y, hue=color, row=row, col=col, data=df, height=facet_height, aspect=aspect_ratio, order=order)
+                    g.set(xlim=(min_x, max_x), ylim=(min_y, max_y), xscale=x_scale, yscale=y_scale)
+                    im = figure_to_pillow_image(g)
                     images.append(im)
 
                 image = stack_images(images)
@@ -245,6 +264,8 @@ def dashboard(host=None, port=None, df=None):
                 g = g.map_lower(off_diag_fn_by_key[pair_plot_lower])
                 g = g.add_legend()
 
+                g.set(xlim=(min_x, max_x), ylim=(min_y, max_y), xscale=x_scale, yscale=y_scale)
+
                 im = figure_to_pillow_image(g)
                 base64_image = image_to_base64(im)
                 html = BASE64_HTML_TAG.format(base64_image)
@@ -266,6 +287,7 @@ def dashboard(host=None, port=None, df=None):
 
                 images = []
                 for y in values:
+                    # TODO: Min/max x/y + log x/y
                     g = sns.JointGrid(x=x, y=y, data=df, height=facet_height)
                     g = g.plot_joint(fn_by_joint_kind[joint_kind])
                     g = g.plot_marginals(sns.distplot, hist=use_hist, kde=use_kde)
@@ -286,6 +308,10 @@ def dashboard(host=None, port=None, df=None):
             return cgi.escape(get_class_name(e) + ': ' + str(e)), 400
 
     app.run(host=host, port=port, debug=True)
+
+
+def float_from_string(string):
+    return float(string) if string else None
 
 
 def figure_to_pillow_image(fig):
