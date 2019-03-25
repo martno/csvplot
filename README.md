@@ -1,6 +1,6 @@
 # CSV Plot
 
-Make statistical visualizations of CSV and Excel files
+Make statistical visualizations of CSV and Excel files in a dashboard
 
 
 ## Install
