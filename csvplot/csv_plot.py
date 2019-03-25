@@ -39,13 +39,17 @@ sns.set()  # Set Seaborn default styles
 
 @click.command()
 @click.option('--host', default='127.0.0.1', show_default=True, 
-              help="The hostname to listen on. Set this to '0.0.0.0' to have the server available externally as well")
+              help="The hostname to listen on. Set this to '0.0.0.0' for the server to be available externally as well")
 @click.option('--port', default=8080, show_default=True, help="Port to listen to")
 @click.option('--csv', help="CSV file to load")
 @click.option('--excel', help="Excel file to load")
-def main(host, port, csv, excel):
+@click.option('--delimiter', default=',', show_default=True, help="Delimiter to use in CSV file")
+@click.option('--sheet-name', default=0, type=str, help="Excel sheet to load. Defaults to first sheet")
+@click.option('--skip-rows', default=0, show_default=True, help="Rows to skip at the beginning")
+@click.option('--skip-blank-lines/--include-blank-lines', default=False, show_default=True, help="Skip over blank lines rather than interpreting as NaN values")
+def main(host, port, csv, excel, delimiter, sheet_name, skip_rows, skip_blank_lines):
     """Starts the CSV Plot dashboard.
-    Loads either the csv or excel file for plotting. If neither option is given, the built-in Titanic dataset is loaded"""
+    Loads either a --csv or --excel file for plotting. If neither of these options are given, the built-in Titanic dataset is loaded."""
 
     if csv is None and excel is None:
         df = sns.load_dataset("titanic")
@@ -54,10 +58,20 @@ def main(host, port, csv, excel):
         if csv is not None and excel is not None:
             raise ValueError('Both --csv and --excel flags cannot be set')
         elif csv is not None:
-            df = pd.read_csv(csv)
+            df = pd.read_csv(
+                csv, 
+                delimiter=delimiter,
+                skiprows=skip_rows, 
+                skip_blank_lines=skip_blank_lines,
+            )
             name = Path(csv).name
         elif excel is not None:
-            df = pd.read_excel(excel)
+            df = pd.read_excel(
+                excel, 
+                sheet_name=sheet_name, 
+                skiprows=skip_rows, 
+                skip_blank_lines=skip_blank_lines,
+            )
             name = Path(excel).name
         else:
             assert False
