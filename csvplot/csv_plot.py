@@ -100,11 +100,11 @@ def dashboard(host, port, df, name):
 
     @app.route('/getcategoryfields', methods=['POST'])
     def getcategoryfields():
-        return jsonify(sorted(col for col in df.columns if dtype_to_type(df[col].dtype) == 'category'))
+        return jsonify([str(col) for col in df.columns if dtype_to_type(df[col].dtype) == 'category'])
 
     @app.route('/getnumberfields', methods=['POST'])
     def getnumberfields():
-        return jsonify(sorted(col for col in df.columns if dtype_to_type(df[col].dtype) == 'number'))
+        return jsonify([str(col) for col in df.columns if dtype_to_type(df[col].dtype) == 'number'])
 
     @app.route('/getresults', methods=['POST'])
     def getresults():
