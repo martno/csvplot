@@ -3,6 +3,9 @@
 Make statistical visualizations of CSV and Excel files in a dashboard
 
 
+![Dashboard](https://user-images.githubusercontent.com/176676/54926047-e1758a00-4f52-11e9-934b-b92f418d3c84.gif)
+
+
 ## Install
 
 ```
