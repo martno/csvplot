@@ -37,6 +37,12 @@ CATEGORY_PLOTS = {
 sns.set()  # Set Seaborn default styles
 
 
+class AttrDict(dict):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.__dict__ = self
+
+
 @click.command()
 @click.option('--host', default='127.0.0.1', show_default=True, 
               help="The hostname to listen on. Set this to '0.0.0.0' for the server to be available externally as well")
@@ -79,6 +85,39 @@ def main(host, port, csv, excel, delimiter, sheet_name, skip_rows, skip_blank_li
     dashboard(host, port, df, name)
 
 
+def preprocess_payload(payload):
+    form_dict = form_data_to_dict(payload['formData'])
+
+    form_dict = {key.replace('-', '_'): value for key, value in form_dict.items()}
+
+    for key in {'min_x', 'max_x', 'min_y', 'max_y'}:
+        form_dict[key] = float_from_string(form_dict[key])
+    
+    for key in {'facet_width', 'facet_height', 'strip_plot_alpha', 'scatter_alpha'}:
+        form_dict[key] = float(form_dict[key])
+    
+    for key in {'regplot_order'}:
+        form_dict[key] = int(form_dict[key])
+    
+    for key in {'strip_plot_dodge', 'heatmap_square', 'heatmap_annotate', 'box_plot_enhance',
+                'violin_plot_split', 'joint_plot_hist', 'joint_plot_kde'}:
+        form_dict[key] = key in form_dict
+    
+    plot_category = form_dict['plot_category']
+    plot_group, plot = plot_category.split('--')
+    form_dict['plot_group'] = plot_group
+    form_dict['plot'] = plot
+
+    form_dict['x_scale'] = 'log' if 'log_x' in form_dict else 'linear'
+    form_dict['y_scale'] = 'log' if 'log_y' in form_dict else 'linear'
+
+    field_data = payload['fieldData']
+
+    assert not (set(form_dict) & set(field_data))
+
+    args = AttrDict({**form_dict, **field_data})
+    return args
+
 def dashboard(host, port, df, name):
     app = Flask(__name__)
 
@@ -110,59 +149,33 @@ def dashboard(host, port, df, name):
     def getresults():
         try:
             payload = request.json
+            args = preprocess_payload(payload)
 
-            form_dict = form_data_to_dict(payload['formData'])
-            # pprint(form_dict)
+            aggregation_fn = FUNC_BY_AGGREGATE[args.aggregate]
 
-            aggregation_fn = FUNC_BY_AGGREGATE[form_dict['aggregate']]
+            aspect_ratio = args.facet_width / args.facet_height
 
-            facet_width = float(form_dict['facet-width'])
-            facet_height = float(form_dict['facet-height'])
-            aspect_ratio = facet_width / facet_height
+            sns.set_style(args.plot_style)
 
-            plot_style = form_dict['plot-style']
-            sns.set_style(plot_style)
-
-            plot_category = form_dict['plot-category']
-            plot_group, kind = plot_category.split('--')
-
-            fields = payload['fieldData']
-            rows = fields['rows']
-            columns = fields['columns']
-            values = fields['values']
-            colors = fields['colors']
-            xaxis = fields['xaxis']
-            shapes = fields['shapes']
-            sizes = fields['sizes']
-
-            min_x = float_from_string(form_dict['min-x'])
-            max_x = float_from_string(form_dict['max-x'])
-            if min_x is not None and max_x is not None and min_x >= max_x:
+            if args.min_x is not None and args.max_x is not None and args.min_x >= args.max_x:
                 raise ValueError('min_x must be less than max_x')
-            min_y = float_from_string(form_dict['min-y'])
-            max_y = float_from_string(form_dict['max-y'])
-            if min_y is not None and max_y is not None and min_y >= max_y:
+            if args.min_y is not None and args.max_y is not None and args.min_y >= args.max_y:
                 raise ValueError('min_y must be less than max_y')
 
-            x_scale = 'log' if 'log-x' in form_dict else 'linear'
-            y_scale = 'log' if 'log-y' in form_dict else 'linear'
-
-            if plot_group == 'pivot':
-                pivot_df = pd.pivot_table(df, values=values, index=rows, 
-                                          columns=columns, aggfunc=aggregation_fn)
+            if args.plot_group == 'pivot':
+                pivot_df = pd.pivot_table(df, values=args.values, index=args.rows, 
+                                          columns=args.columns, aggfunc=aggregation_fn)
                 
                 if isinstance(pivot_df, pd.Series):
                     pivot_df = pivot_df.to_frame().T
 
-                if kind == 'pivot-table':
+                if args.plot == 'pivot-table':
                     table = to_html_table(pivot_df)
                     return table
 
-                elif kind == 'heatmap':
-                    square = 'heatmap-square' in form_dict
-                    show_values = 'heatmap-annotate' in form_dict
+                elif args.plot == 'heatmap':
                     plt.figure()  # Reset figure
-                    fig = sns.heatmap(pivot_df, annot=show_values, square=square).get_figure()
+                    fig = sns.heatmap(pivot_df, annot=args.heatmap_annotate, square=args.heatmap_square).get_figure()
 
                     image = figure_to_pillow_image(fig)
                     base64_image = image_to_base64(image)
@@ -171,43 +184,43 @@ def dashboard(host, port, df, name):
                     return html
 
                 else:
-                    raise ValueError('Invalid kind: {}'.format(kind))
+                    raise ValueError('Invalid plot: {}'.format(args.plot))
 
-            if plot_group == 'category-plot':
-                if len(columns) == 0:
+            if args.plot_group == 'category-plot':
+                if len(args.columns) == 0:
                     raise ValueError('At least one column is required')
-                elif len(columns) > 3:
+                elif len(args.columns) > 3:
                     raise ValueError('No more than 3 columns allowed')
-                elif len(columns) == 1:
-                    col, x, hue = None, columns[0], None
-                elif len(columns) == 2:
-                    col, x, hue = None, columns[0], columns[1]
+                elif len(args.columns) == 1:
+                    col, x, hue = None, args.columns[0], None
+                elif len(args.columns) == 2:
+                    col, x, hue = None, args.columns[0], args.columns[1]
                 else:
-                    col, x, hue = columns
+                    col, x, hue = args.columns
 
-                row = rows[0] if rows else None
+                row = args.rows[0] if args.rows else None
 
                 kwargs = {}
-                if kind == 'strip':
+                if args.plot == 'strip':
                     kwargs = {
-                        'alpha': float(form_dict['strip-plot-alpha']),
-                        'dodge': 'strip-plot-dodge' in  form_dict,
+                        'alpha': args.strip_plot_alpha,
+                        'dodge': args.strip_plot_dodge,
                     }
-                elif kind == 'box':
-                    if 'box-plot-enhance' in  form_dict:
-                        kind = 'boxen'
-                elif kind == 'violin':
+                elif args.plot == 'box':
+                    if args.box_plot_enhance:
+                        args.plot = 'boxen'
+                elif args.plot == 'violin':
                     kwargs = {
-                        'inner': form_dict['violin-inner'],
-                        'split': 'violin-plot-split' in form_dict,
+                        'inner': args.violin_inner,
+                        'split': args.violin_plot_split,
                     }
 
                 images = []
-                for y in values:
-                    g = sns.catplot(x=x, y=y, hue=hue, row=row, col=col, data=df, estimator=aggregation_fn, kind=kind, 
-                                    margin_titles=True, height=facet_height, aspect=aspect_ratio, **kwargs)
+                for y in args.values:
+                    g = sns.catplot(x=x, y=y, hue=hue, row=row, col=col, data=df, estimator=aggregation_fn, kind=args.plot, 
+                                    margin_titles=True, height=args.facet_height, aspect=aspect_ratio, **kwargs)
 
-                    g.set(ylim=(min_y, max_y), yscale=y_scale)
+                    g.set(ylim=(args.min_y, args.max_y), yscale=args.y_scale)
 
                     im = figure_to_pillow_image(g)
                     images.append(im)
@@ -217,26 +230,26 @@ def dashboard(host, port, df, name):
                 html = BASE64_HTML_TAG.format(base64_image)
                 return html
 
-            elif plot_group == 'relative-plot':
-                x = xaxis[0]
-                color = colors[0] if colors else None
-                shape = shapes[0] if shapes else None
-                size = sizes[0] if sizes else None
-                row = rows[0] if rows else None
-                col = columns[0] if columns else None
+            elif args.plot_group == 'relative-plot':
+                x = args.xaxis[0]
+                color = args.colors[0] if args.colors else None
+                shape = args.shapes[0] if args.shapes else None
+                size = args.sizes[0] if args.sizes else None
+                row = args.rows[0] if args.rows else None
+                col = args.columns[0] if args.columns else None
 
                 kwargs = {}
-                if kind == 'scatter':
+                if args.plot == 'scatter':
                     kwargs = {
-                        'alpha': float(form_dict['scatter-alpha']),
+                        'alpha': args.scatter_alpha,
                     }
 
                 images = []
-                for y in values:
-                    g = sns.relplot(x=x, y=y, hue=color, size=size, style=shape, row=row, col=col, data=df, kind=kind, 
-                                    height=facet_height, aspect=aspect_ratio, facet_kws={'margin_titles' : True}, **kwargs)
+                for y in args.values:
+                    g = sns.relplot(x=x, y=y, hue=color, size=size, style=shape, row=row, col=col, data=df, kind=args.plot, 
+                                    height=args.facet_height, aspect=aspect_ratio, facet_kws={'margin_titles' : True}, **kwargs)
 
-                    g.set(xlim=(min_x, max_x), ylim=(min_y, max_y), xscale=x_scale, yscale=y_scale)
+                    g.set(xlim=(args.min_x, args.max_x), ylim=(args.min_y, args.max_y), xscale=args.x_scale, yscale=args.y_scale)
                                       
                     im = figure_to_pillow_image(g)
                     images.append(im)
@@ -246,18 +259,18 @@ def dashboard(host, port, df, name):
                 html = BASE64_HTML_TAG.format(base64_image)
                 return html
 
-            elif plot_group == 'regplot':
-                x = xaxis[0]
-                color = colors[0] if colors else None
-                row = rows[0] if rows else None
-                col = columns[0] if columns else None
+            elif args.plot_group == 'regplot':
+                x = args.xaxis[0]
+                color = args.colors[0] if args.colors else None
+                row = args.rows[0] if args.rows else None
+                col = args.columns[0] if args.columns else None
 
-                order = int(form_dict['regplot-order'])
+                order = args.regplot_order
 
                 images = []
-                for y in values:
-                    g = sns.lmplot(x=x, y=y, hue=color, row=row, col=col, data=df, height=facet_height, aspect=aspect_ratio, order=order)
-                    g.set(xlim=(min_x, max_x), ylim=(min_y, max_y), xscale=x_scale, yscale=y_scale)
+                for y in args.values:
+                    g = sns.lmplot(x=x, y=y, hue=color, row=row, col=col, data=df, height=args.facet_height, aspect=aspect_ratio, order=order)
+                    g.set(xlim=(args.min_x, args.max_x), ylim=(args.min_y, args.max_y), xscale=args.x_scale, yscale=args.y_scale)
                     im = figure_to_pillow_image(g)
                     images.append(im)
 
@@ -266,15 +279,11 @@ def dashboard(host, port, df, name):
                 html = BASE64_HTML_TAG.format(base64_image)
                 return html
             
-            elif plot_group == 'pair-plot':
-                color = colors[0] if colors else None
-                data = df[values].fillna(0)  # TODO: drop n/a instead
+            elif args.plot_group == 'pair-plot':
+                color = args.colors[0] if args.colors else None
+                data = df[args.values].fillna(0)  # TODO: drop n/a instead
     
-                data = pd.concat((data, df[colors]), axis='columns')
-
-                pair_plot_diag = form_dict['pair-plot-diag']
-                pair_plot_upper = form_dict['pair-plot-upper']
-                pair_plot_lower = form_dict['pair-plot-lower']
+                data = pd.concat((data, df[args.colors]), axis='columns')
 
                 diag_fn_by_key = {
                     'hist': plt.hist, 
@@ -286,23 +295,21 @@ def dashboard(host, port, df, name):
                     'kde': sns.kdeplot,
                 }
 
-                g = sns.PairGrid(data, hue=color, height=facet_height, aspect=aspect_ratio)
-                g = g.map_diag(diag_fn_by_key[pair_plot_diag])
-                g = g.map_upper(off_diag_fn_by_key[pair_plot_upper])
-                g = g.map_lower(off_diag_fn_by_key[pair_plot_lower])
+                g = sns.PairGrid(data, hue=color, height=args.facet_height, aspect=aspect_ratio)
+                g = g.map_diag(diag_fn_by_key[args.pair_plot_diag])
+                g = g.map_upper(off_diag_fn_by_key[args.pair_plot_upper])
+                g = g.map_lower(off_diag_fn_by_key[args.pair_plot_lower])
                 g = g.add_legend()
 
-                g.set(xlim=(min_x, max_x), ylim=(min_y, max_y), xscale=x_scale, yscale=y_scale)
+                g.set(xlim=(args.min_x, args.max_x), ylim=(args.min_y, args.max_y), xscale=args.x_scale, yscale=args.y_scale)
 
                 im = figure_to_pillow_image(g)
                 base64_image = image_to_base64(im)
                 html = BASE64_HTML_TAG.format(base64_image)
                 return html
 
-            elif plot_group == 'joint-plot':
-                x = xaxis[0]
-
-                joint_kind = form_dict['joint-plot-kind']
+            elif args.plot_group == 'joint-plot':
+                x = args.xaxis[0]
 
                 fn_by_joint_kind = {
                     'scatter': sns.scatterplot,
@@ -310,15 +317,12 @@ def dashboard(host, port, df, name):
                     'kde': sns.kdeplot,
                 }
 
-                use_hist = 'joint-plot-hist' in form_dict
-                use_kde = 'joint-plot-kde' in form_dict
-
                 images = []
-                for y in values:
+                for y in args.values:
                     # TODO: Min/max x/y + log x/y
-                    g = sns.JointGrid(x=x, y=y, data=df, height=facet_height)
-                    g = g.plot_joint(fn_by_joint_kind[joint_kind])
-                    g = g.plot_marginals(sns.distplot, hist=use_hist, kde=use_kde)
+                    g = sns.JointGrid(x=x, y=y, data=df, height=args.facet_height)
+                    g = g.plot_joint(fn_by_joint_kind[args.joint_plot_kind])
+                    g = g.plot_marginals(sns.distplot, hist=args.joint_plot_hist, kde=args.joint_plot_kde)
 
                     im = figure_to_pillow_image(g)
                     images.append(im)
@@ -329,7 +333,7 @@ def dashboard(host, port, df, name):
                 return html
 
             else:
-                raise ValueError('Invalid plot_group: {}'.format(plot_group))
+                raise ValueError('Invalid plot_group: {}'.format(args.plot_group))
 
         except Exception as e:
             traceback.print_exc()
