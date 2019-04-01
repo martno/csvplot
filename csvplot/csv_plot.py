@@ -57,31 +57,29 @@ def main(host, port, csv, excel, delimiter, sheet_name, skip_rows, skip_blank_li
     """Starts the CSV Plot dashboard.
     Loads either a --csv or --excel file for plotting. If neither of these options are given, the built-in Titanic dataset is loaded."""
 
-    if csv is None and excel is None:
+    if csv is not None and excel is not None:
+        raise ValueError('Both --csv and --excel flags cannot be set')
+    elif csv is not None:
+        df = pd.read_csv(
+            csv,
+            delimiter=delimiter,
+            skiprows=skip_rows,
+            skip_blank_lines=skip_blank_lines,
+        )
+        name = Path(csv).name
+    elif excel is not None:
+        df = pd.read_excel(
+            excel,
+            sheet_name=sheet_name,
+            skiprows=skip_rows,
+            skip_blank_lines=skip_blank_lines,
+        )
+        name = Path(excel).name
+    else:
+        assert csv is None and excel is None
         df = sns.load_dataset("titanic")
         name = "Titanic"
-    else:
-        if csv is not None and excel is not None:
-            raise ValueError('Both --csv and --excel flags cannot be set')
-        elif csv is not None:
-            df = pd.read_csv(
-                csv, 
-                delimiter=delimiter,
-                skiprows=skip_rows, 
-                skip_blank_lines=skip_blank_lines,
-            )
-            name = Path(csv).name
-        elif excel is not None:
-            df = pd.read_excel(
-                excel, 
-                sheet_name=sheet_name, 
-                skiprows=skip_rows, 
-                skip_blank_lines=skip_blank_lines,
-            )
-            name = Path(excel).name
-        else:
-            assert False
-    
+
     dashboard(host, port, df, name)
 
 
