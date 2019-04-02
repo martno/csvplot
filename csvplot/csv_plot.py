@@ -29,6 +29,7 @@ CATEGORY_PLOTS = {
     'bar',
     'point',
     'strip',
+    'swarm',
     'box',
     'violin',
 }
@@ -529,6 +530,7 @@ PLOT_GROUP_BY_PLOT = {
     'heatmap': 'pivot',
     'bar': 'category-plot',
     'strip': 'category-plot',
+    'swarm': 'category-plot',
     'violin': 'category-plot',
     'point': 'category-plot',
     'scatter': 'relative-plot',
@@ -547,7 +549,7 @@ PLOT_GROUP_BY_PLOT = {
 @click.option('--output', help="Output filename", required=True)
 @click.option('--plot', help="Plot type", required=True,
               type=click.Choice(
-                  ['heatmap', 'bar', 'strip', 'box', 'violin', 'point', 'scatter', 'line', 'regplot', 'pair-plot',
+                  ['heatmap', 'bar', 'strip', 'swarm', 'box', 'violin', 'point', 'scatter', 'line', 'regplot', 'pair-plot',
                    'joint-plot']))
 @click.option('--rows', default='', help="Row fields (separate by comma)")
 @click.option('--columns', default='', help="Column fields (separate by comma)")
