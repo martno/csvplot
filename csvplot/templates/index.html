@@ -12,6 +12,8 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4"
     crossorigin="anonymous">
 
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.10/css/all.css" integrity="sha384-+d0P83n9kaQMCwj8F4RJB66tzIwOKmrdb46+porD/OvrJ+37WqIM7UoBtwHO6Nlg" crossorigin="anonymous">
+
   <link rel='stylesheet' href='https://bevacqua.github.io/dragula/dist/dragula.css'>
 
   <link rel="stylesheet" href="css/mystyle.css" />
@@ -238,7 +240,8 @@
                   <div id="pivot--heatmap" class='plot-option'>
                     <div class="form-group form-check">
                       <input type="checkbox" class="form-check-input" id="heatmap-square" name="heatmap-square" value="true">
-                      <label class="form-check-label" for="heatmap-square">Square</label>
+                      <label class="form-check-label" for="heatmap-square">Square </label> 
+                      <i class="fas fa-info-circle" data-toggle="tooltip" title="Set the Axes aspect to 'equal' so each cell will be square-shaped"></i>
                       <br>
                       <input type="checkbox" class="form-check-input" id="heatmap-annotate" name="heatmap-annotate" value="true">
                       <label class="form-check-label" for="heatmap-annotate">Show values</label>
@@ -257,18 +260,19 @@
                     <div class="form-group form-check">
                       <input type="checkbox" class="form-check-input" id="strip-plot-dodge" name="strip-plot-dodge" value="true">
                       <label class="form-check-label" for="strip-plot-dodge">Dodge</label>
+                      <i class="fas fa-info-circle" data-toggle="tooltip" title="Separate the strips for different categories"></i>
                     </div>
                   </div>
 
                   <div id="category-plot--box" class='plot-option'>
                     <div class="form-group form-check">
                       <input type="checkbox" class="form-check-input" id="box-plot-enhance" name="box-plot-enhance" value="true">
-                      <label class="form-check-label" for="box-plot-enhance">Enhanced</label>
+                      <label class="form-check-label" for="box-plot-enhance">Enhanced box plot</label>
                     </div>
                   </div>
 
                   <div id="category-plot--violin" class='plot-option'>
-                    Inner
+                    Inner <i class="fas fa-info-circle" data-toggle="tooltip" title="Representation of the datapoints in the violin interior"></i>
                     <select name='violin-inner' class="form-control form-control-sm">
                       <option value='box'>Box</option>
                       <option value='quartile'>Quartile</option>
@@ -280,25 +284,24 @@
                     <div class="form-group form-check">
                       <input type="checkbox" class="form-check-input" id="violin-plot-split" name="violin-plot-split" value="true">
                       <label class="form-check-label" for="violin-plot-split">Split</label>
+                      <i class="fas fa-info-circle" data-toggle="tooltip" title="Draws half of a violin for each category value. Requires that the bottommost category contains exactly two different values"></i>
                     </div>
                   </div>
 
                   <div id="regplot--regplot" class='plot-option'>
-                    Order
+                    Order <i class="fas fa-info-circle" data-toggle="tooltip" title="Degree of the fitting polynomial"></i>
                     <input class='form-control form-control-sm' type='text' value='1' name='regplot-order'>
                   </div>
 
                   <div id="joint-plot--joint-plot" class='plot-option'>
-                    Joint kind
+                    Plot kind
                     <select name='joint-plot-kind' class="form-control form-control-sm">
                       <option value='scatter'>Scatter</option>
                       <option value='reg'>Linear regression</option>
                       <option value='kde'>KDE</option>
                     </select>
 
-                    <br>
-
-                    Marginals
+                    Marginals <i class="fas fa-info-circle" data-toggle="tooltip" title="Univariate functions on the marginals"></i>
                     <div class="form-group form-check">
                       <input type="checkbox" class="form-check-input" id="joint-plot-hist" name="joint-plot-hist" value="true" checked>
                       <label class="form-check-label" for="joint-plot-hist">Histogram</label>
@@ -309,19 +312,19 @@
                   </div>
 
                   <div id="pair-plot--pair-plot" class='plot-option'>
-                    Upper
+                    Upper <i class="fas fa-info-circle" data-toggle="tooltip" title="Bivariate function on the upper diagonal subplots"></i>
                     <select name='pair-plot-upper' class="form-control form-control-sm">
                       <option value='scatter'>Scatter</option>
                       <option value='kde'>KDE</option>
                     </select>
 
-                    Diagonal
+                    Diagonal <i class="fas fa-info-circle" data-toggle="tooltip" title="Univariate function on each diagonal subplot"></i>
                     <select name='pair-plot-diag' class="form-control form-control-sm">
                       <option value='hist'>Histogram</option>
                       <option value='kde'>KDE</option>
                     </select>
 
-                    Lower
+                    Lower <i class="fas fa-info-circle" data-toggle="tooltip" title="Bivariate function on the lower diagonal subplots"></i>
                     <select name='pair-plot-lower' class="form-control form-control-sm">
                       <option value='scatter'>Scatter</option>
                       <option value='kde'>KDE</option>
@@ -337,7 +340,7 @@
                 </div>
                 <div class='p-1'>
         
-                  Aggregate
+                  Aggregate <i class="fas fa-info-circle" data-toggle="tooltip" title="Function to use for aggregating the data. Only used for pivot table, heatmap, box plot and point plot"></i>
                   <select name='aggregate' class="form-control form-control-sm">
                     <option value='average'>Average</option>
                     <option value='sum'>Sum</option>
