@@ -43,8 +43,13 @@ class AttrDict(dict):
         self.__dict__ = self
 
 
-@click.command()
-@click.option('--host', default='127.0.0.1', show_default=True, 
+@click.group()
+def cli():
+    pass
+
+
+@cli.command()
+@click.option('--host', default='127.0.0.1', show_default=True,
               help="The hostname to listen on. Set this to '0.0.0.0' for the server to be available externally as well")
 @click.option('--port', default=8080, show_default=True, help="Port to listen to")
 @click.option('--csv', help="CSV file to load")
@@ -53,10 +58,15 @@ class AttrDict(dict):
 @click.option('--sheet-name', default=0, type=str, help="Excel sheet to load. Defaults to first sheet")
 @click.option('--skip-rows', default=0, show_default=True, help="Rows to skip at the beginning")
 @click.option('--skip-blank-lines/--include-blank-lines', default=False, show_default=True, help="Skip over blank lines rather than interpreting as NaN values")
-def main(host, port, csv, excel, delimiter, sheet_name, skip_rows, skip_blank_lines):
-    """Starts the CSV Plot dashboard.
+def dashboard(host, port, csv, excel, delimiter, sheet_name, skip_rows, skip_blank_lines):
+    """Starts the CSV Plot dashboard
     Loads either a --csv or --excel file for plotting. If neither of these options are given, the built-in Titanic dataset is loaded."""
 
+    df, name = load_data(csv, delimiter, excel, sheet_name, skip_blank_lines, skip_rows)
+    dashboard(host, port, df, name)
+
+
+def load_data(csv, delimiter, excel, sheet_name, skip_blank_lines, skip_rows):
     if csv is not None and excel is not None:
         raise ValueError('Both --csv and --excel flags cannot be set')
     elif csv is not None:
@@ -80,7 +90,7 @@ def main(host, port, csv, excel, delimiter, sheet_name, skip_rows, skip_blank_li
         df = sns.load_dataset("titanic")
         name = "Titanic"
 
-    dashboard(host, port, df, name)
+    return df, name
 
 
 def dashboard(host, port, df, name):
@@ -188,7 +198,7 @@ def preprocess_payload(payload):
 def form_data_to_dict(form_data):
     form_items = form_data.split('&')
     form_items = [item.split('=') for item in form_items]
-    form_dict = {key: value if value != 'null' else None for key, value in form_items}
+    form_dict = {key: (value if value != 'null' else None) for key, value in form_items}
 
     return form_dict
 
@@ -447,6 +457,95 @@ def get_class_name(object):
     return object.__class__.__name__
 
 
+PLOT_GROUP_BY_PLOT = {
+    'heatmap': 'pivot',
+    'bar': 'category-plot',
+    'strip': 'category-plot',
+    'violin': 'category-plot',
+    'point': 'category-plot',
+    'scatter': 'relative-plot',
+    'line': 'relative-plot',
+    'regplot': 'regplot',
+    'pair-plot': 'pair-plot',
+    'joint-plot': 'joint-plot',
+}
+
+
+@cli.command()
+@click.option('--csv', help="CSV file to load")
+@click.option('--excel', help="Excel file to load")
+@click.option('--delimiter', default=',', show_default=True, help="Delimiter to use in CSV file")
+@click.option('--sheet-name', default=0, type=str, help="Excel sheet to load. Defaults to first sheet")
+@click.option('--skip-rows', default=0, show_default=True, help="Rows to skip at the beginning")
+@click.option('--skip-blank-lines/--include-blank-lines', default=False, show_default=True, help="Skip over blank lines rather than interpreting as NaN values")
+@click.option('--output', help="Output filename", required=True)
+@click.option('--plot', help="Plot type", required=True,
+              type=click.Choice(
+                  ['heatmap', 'bar', 'strip', 'box', 'violin', 'point', 'scatter', 'line', 'regplot', 'pair-plot',
+                   'joint-plot']))
+@click.option('--rows', default='', help="Row fields (separate by comma)")
+@click.option('--columns', default='', help="Column fields (separate by comma)")
+@click.option('--values', default='', help="Value fields (separate by comma)")
+@click.option('--colors', default='', help="Color field")
+@click.option('--xaxis', default='', help="X axis field")
+@click.option('--shapes', default='', help="Shape field")
+@click.option('--sizes', default='', help="Size field")
+@click.option('--aggregate', default='average', show_default=True, help="Aggregation function", type=click.Choice(['average', 'sum']))
+@click.option('--facet-width', default=4.0, show_default=True, help="Facet width")
+@click.option('--facet-height', default=4.0, show_default=True, help="Facet height")
+@click.option('--plot-style', default='darkgrid', show_default=True, help="Plot style",
+              type=click.Choice(['darkgrid', 'whitegrid', 'dark', 'white', 'ticks']))
+@click.option('--min-x', default=None, type=float, help="Min x")
+@click.option('--max-x', default=None, type=float, help="Max x")
+@click.option('--min-y', default=None, type=float, help="Min y")
+@click.option('--max-y', default=None, type=float, help="Max y")
+@click.option('--x-scale', default='linear', show_default=True, type=click.Choice(['linear', 'log']))
+@click.option('--y-scale', default='linear', show_default=True, type=click.Choice(['linear', 'log']))
+@click.option('--heatmap-square/--no-heatmap-square', default=False, show_default=True)
+@click.option('--heatmap-annotate/--no-heatmap-annotate', default=False, show_default=True)
+@click.option('--strip-plot-alpha', default=1.0, show_default=True)
+@click.option('--strip-plot-dodge/--strip-plot-no-dodge', default=False, show_default=True)
+@click.option('--box-plot-enhance/--box-plot-no-enhance', default=False, show_default=True)
+@click.option('--violin-inner', default='box', show_default=True,
+              type=click.Choice(['box', 'quartile', 'point', 'stick', 'None']))
+@click.option('--violin-plot-split/--violin-plot-no-split', default=False, show_default=True)
+@click.option('--scatter-alpha', default=1.0, show_default=True)
+@click.option('--regplot-order', default=1, show_default=True)
+@click.option('--pair-plot-diag', default='hist', show_default=True, type=click.Choice(['hist', 'kde']))
+@click.option('--pair-plot-upper', default='scatter', show_default=True, type=click.Choice(['scatter', 'kde']))
+@click.option('--pair-plot-lower', default='scatter', show_default=True, type=click.Choice(['scatter', 'kde']))
+@click.option('--joint-plot-kind', default='scatter', show_default=True, type=click.Choice(['scatter', 'reg', 'kde']))
+@click.option('--joint-plot-hist', default=True, show_default=True)
+@click.option('--joint-plot-kde', default=True, show_default=True)
+def generate(**kwargs):
+    """Generates plots"""
+    kwargs = {key: (value if value != 'None' else None) for key, value in kwargs.items()}
+
+    for key in {'rows', 'columns', 'values', 'colors', 'xaxis', 'shapes', 'sizes'}:
+        kwargs[key] = [v for v in kwargs[key].split(',') if v]
+
+    kwargs['plot_group'] = PLOT_GROUP_BY_PLOT[kwargs['plot']]
+
+    kwargs['aspect_ratio'] = kwargs['facet_width'] / kwargs['facet_height']
+
+    args = AttrDict(kwargs)
+
+    df, name = load_data(args.csv, args.delimiter, args.excel, args.sheet_name, args.skip_blank_lines, args.skip_rows)
+
+    sns.set_style(args.plot_style)
+
+    if args.min_x is not None and args.max_x is not None and args.min_x >= args.max_x:
+        raise ValueError('min_x must be less than max_x')
+    if args.min_y is not None and args.max_y is not None and args.min_y >= args.max_y:
+        raise ValueError('min_y must be less than max_y')
+
+    plot_fn = PLOT_FN_BY_NAME[args.plot_group]
+    image = plot_fn(df, args)
+
+    image.save(args.output)
+
+
+
 PLOT_FN_BY_NAME = {
     'heatmap': create_heatmap,
     'category-plot': create_category_plot,
@@ -457,4 +556,4 @@ PLOT_FN_BY_NAME = {
 }
 
 if __name__ == "__main__":
-    main()
+    cli()

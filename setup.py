@@ -53,7 +53,7 @@ setuptools.setup(
     ],
     entry_points = {
         'console_scripts': [
-            'csv-plot=csvplot.csv_plot:main',
+            'csv-plot=csvplot.csv_plot:cli',
         ],
     },
 )
