@@ -542,7 +542,7 @@ def create_plot_tabs(plot, script):
           <a data-toggle="pill" class="nav-link active text-center" href="#plot-tab" role="tab">Plot</a>
         </li>
         <li class="nav-item">
-          <a data-toggle="pill" class="nav-link text-center" href="#regenerate-tab" role="tab">Re-generate</a>
+          <a data-toggle="pill" class="nav-link text-center" href="#regenerate-tab" role="tab">Regenerate</a>
         </li>
       </ul>
 
