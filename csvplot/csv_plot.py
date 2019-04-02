@@ -188,8 +188,9 @@ def preprocess_payload(payload):
     for key in {'regplot_order', 'rotate_x_label'}:
         form_dict[key] = int(form_dict[key])
 
-    for key in {'strip_plot_dodge', 'heatmap_square', 'heatmap_annotate', 'box_plot_enhance',
-                'violin_plot_split', 'joint_plot_hist', 'joint_plot_kde'}:
+    checkboxes = {'strip_plot_dodge', 'heatmap_square', 'heatmap_annotate', 'box_plot_enhance',
+                  'violin_plot_split', 'joint_plot_hist', 'joint_plot_kde', 'bar_plot_annotate'}
+    for key in checkboxes:
         form_dict[key] = key in form_dict
 
     plot_category = form_dict['plot_category']
@@ -318,11 +319,45 @@ def create_category_plot(df, args):
         g.set(ylim=(args.min_y, args.max_y), yscale=args.y_scale)
         g.set_xticklabels(rotation=args.rotate_x_label)
 
+        if args.plot == 'bar' and args.bar_plot_annotate:
+            autolabel_ax(g.axes)
+
         im = figure_to_pillow_image(g)
         images.append(im)
 
     image = stack_images(images)
     return image
+
+
+def autolabel_ax(ax):
+    if type(ax) == np.ndarray:
+        for a in ax:
+            autolabel_ax(a)
+        return
+
+    for c in ax.containers:
+        rects = c.get_children()
+        autolabel(ax, rects, xpos='left')
+
+
+def autolabel(ax, rects, xpos):
+    """
+    From https://matplotlib.org/gallery/lines_bars_and_markers/barchart.html#sphx-glr-gallery-lines-bars-and-markers-barchart-py
+
+    Attach a text label above each bar in *rects*, displaying its height.
+
+    *xpos* indicates which side to place the text w.r.t. the center of
+    the bar. It can be one of the following {'center', 'right', 'left'}.
+    """
+
+    xpos = xpos.lower()  # normalize the case of the parameter
+    ha = {'center': 'center', 'right': 'left', 'left': 'right'}
+    offset = {'center': 0.5, 'right': 0.57, 'left': 0.43}  # x_txt = x + w*off
+
+    for rect in rects:
+        height = rect.get_height()
+        ax.text(rect.get_x() + rect.get_width()*offset[xpos], 1.01*height,
+                '%.2f' % height, ha=ha[xpos], va='bottom')
 
 
 def create_relative_plot(df, args):
@@ -573,6 +608,7 @@ PLOT_GROUP_BY_PLOT = {
 @click.option('--rotate-x-label', default=0, help="Rotate x label")
 @click.option('--heatmap-square/--no-heatmap-square', default=False, show_default=True)
 @click.option('--heatmap-annotate/--no-heatmap-annotate', default=False, show_default=True)
+@click.option('--bar-plot-annotate/--bar-plot-no-annotate', default=False, show_default=True)
 @click.option('--strip-plot-alpha', default=1.0, show_default=True)
 @click.option('--strip-plot-dodge/--strip-plot-no-dodge', default=False, show_default=True)
 @click.option('--box-plot-enhance/--box-plot-no-enhance', default=False, show_default=True)
@@ -659,6 +695,7 @@ FLAGS_BY_PLOT_NAME = {
         'max_y',
         'y_scale',
         'rotate_x_label',
+        'bar_plot_annotate',
     },
     'relative-plot': {
         'xaxis',
