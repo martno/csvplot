@@ -58,7 +58,7 @@ def cli():
 @click.option('--delimiter', default=None, show_default=True, help="Delimiter to use in CSV file")
 @click.option('--sheet-name', default=None, type=str, help="Excel sheet to load. Defaults to first sheet")
 def dashboard(host, port, csv, excel, delimiter, sheet_name):
-    """Starts the CSV Plot dashboard
+    """Starts the CSV Plot dashboard.
     Loads either a --csv or --excel file for plotting. If neither of these options are given, the built-in Titanic dataset is loaded."""
 
     df, name = load_data(csv, delimiter, excel, sheet_name)
@@ -624,7 +624,7 @@ PLOT_GROUP_BY_PLOT = {
 @click.option('--joint-plot-hist', default=True, show_default=True)
 @click.option('--joint-plot-kde', default=True, show_default=True)
 def generate(**kwargs):
-    """Generates plots"""
+    """Generates plots."""
     kwargs = {key: (value if value != 'None' else None) for key, value in kwargs.items()}
 
     for key in {'rows', 'columns', 'values', 'colors', 'xaxis', 'shapes', 'sizes'}:
