@@ -185,7 +185,7 @@ def preprocess_payload(payload):
     for key in {'facet_width', 'facet_height', 'strip_plot_alpha', 'scatter_alpha'}:
         form_dict[key] = float(form_dict[key])
 
-    for key in {'regplot_order'}:
+    for key in {'regplot_order', 'rotate_x_label'}:
         form_dict[key] = int(form_dict[key])
 
     for key in {'strip_plot_dodge', 'heatmap_square', 'heatmap_annotate', 'box_plot_enhance',
@@ -316,6 +316,7 @@ def create_category_plot(df, args):
                         margin_titles=True, height=args.facet_height, aspect=args.aspect_ratio, **kwargs)
 
         g.set(ylim=(args.min_y, args.max_y), yscale=args.y_scale)
+        g.set_xticklabels(rotation=args.rotate_x_label)
 
         im = figure_to_pillow_image(g)
         images.append(im)
@@ -569,6 +570,7 @@ PLOT_GROUP_BY_PLOT = {
 @click.option('--max-y', default=None, type=float, help="Max y")
 @click.option('--x-scale', default='linear', show_default=True, type=click.Choice(['linear', 'log']))
 @click.option('--y-scale', default='linear', show_default=True, type=click.Choice(['linear', 'log']))
+@click.option('--rotate-x-label', default=0, help="Rotate x label")
 @click.option('--heatmap-square/--no-heatmap-square', default=False, show_default=True)
 @click.option('--heatmap-annotate/--no-heatmap-annotate', default=False, show_default=True)
 @click.option('--strip-plot-alpha', default=1.0, show_default=True)
@@ -656,6 +658,7 @@ FLAGS_BY_PLOT_NAME = {
         'min_y',
         'max_y',
         'y_scale',
+        'rotate_x_label',
     },
     'relative-plot': {
         'xaxis',
