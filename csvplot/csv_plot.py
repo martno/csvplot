@@ -54,35 +54,42 @@ def cli():
 @click.option('--port', default=8080, show_default=True, help="Port to listen to")
 @click.option('--csv', help="CSV file to load")
 @click.option('--excel', help="Excel file to load")
-@click.option('--delimiter', default=',', show_default=True, help="Delimiter to use in CSV file")
-@click.option('--sheet-name', default=0, type=str, help="Excel sheet to load. Defaults to first sheet")
-@click.option('--skip-rows', default=0, show_default=True, help="Rows to skip at the beginning")
-@click.option('--skip-blank-lines/--include-blank-lines', default=False, show_default=True, help="Skip over blank lines rather than interpreting as NaN values")
-def dashboard(host, port, csv, excel, delimiter, sheet_name, skip_rows, skip_blank_lines):
+@click.option('--delimiter', default=None, show_default=True, help="Delimiter to use in CSV file")
+@click.option('--sheet-name', default=None, type=str, help="Excel sheet to load. Defaults to first sheet")
+def dashboard(host, port, csv, excel, delimiter, sheet_name):
     """Starts the CSV Plot dashboard
     Loads either a --csv or --excel file for plotting. If neither of these options are given, the built-in Titanic dataset is loaded."""
 
-    df, name = load_data(csv, delimiter, excel, sheet_name, skip_blank_lines, skip_rows)
-    dashboard(host, port, df, name)
+    df, name = load_data(csv, delimiter, excel, sheet_name)
+
+    kwargs = {
+        'csv': csv,
+        'excel': excel,
+        'delimiter': delimiter,
+        'sheet_name': sheet_name,
+    }
+
+    dashboard(host, port, df, name, kwargs)
 
 
-def load_data(csv, delimiter, excel, sheet_name, skip_blank_lines, skip_rows):
+def load_data(csv, delimiter, excel, sheet_name):
+    if delimiter is None:
+        delimiter = ','
+    if sheet_name is None:
+        sheet_name = 0
+
     if csv is not None and excel is not None:
         raise ValueError('Both --csv and --excel flags cannot be set')
     elif csv is not None:
         df = pd.read_csv(
             csv,
             delimiter=delimiter,
-            skiprows=skip_rows,
-            skip_blank_lines=skip_blank_lines,
         )
         name = Path(csv).name
     elif excel is not None:
         df = pd.read_excel(
             excel,
             sheet_name=sheet_name,
-            skiprows=skip_rows,
-            skip_blank_lines=skip_blank_lines,
         )
         name = Path(excel).name
     else:
@@ -93,7 +100,7 @@ def load_data(csv, delimiter, excel, sheet_name, skip_blank_lines, skip_rows):
     return df, name
 
 
-def dashboard(host, port, df, name):
+def dashboard(host, port, df, name, kwargs):
     app = Flask(__name__)
 
     @app.route('/')
@@ -126,6 +133,9 @@ def dashboard(host, port, df, name):
             payload = request.json
             args = preprocess_payload(payload)
 
+            for key, value in kwargs.items():
+                args[key] = value
+
             sns.set_style(args.plot_style)
 
             if args.min_x is not None and args.max_x is not None and args.min_x >= args.max_x:
@@ -133,7 +143,7 @@ def dashboard(host, port, df, name):
             if args.min_y is not None and args.max_y is not None and args.min_y >= args.max_y:
                 raise ValueError('min_y must be less than max_y')
 
-            if args.plot_group == 'pivot-table':
+            if args.plot_group == 'pivot' and args.plot == 'pivot-table':
                 pivot_df = to_pivot_df(df, args)
                 table = to_html_table(pivot_df)
                 return table
@@ -144,7 +154,11 @@ def dashboard(host, port, df, name):
 
                 base64_image = image_to_base64(image)
                 html = BASE64_HTML_TAG.format(base64_image)
-                return html
+
+                flags = DEFAULT_FLAGS | FLAGS_BY_PLOT_NAME[args.plot_group]
+                script = get_script(args, flags)
+
+                return create_plot_tabs(html, script)
 
         except Exception as e:
             traceback.print_exc()
@@ -453,6 +467,60 @@ def image_to_base64(image):
     return image_string
 
 
+def get_script(args, flags):
+    on_off_flags_by_flag = {param.name: {True: param.opts[0], False: param.secondary_opts[0]}
+                            for param in generate.params if param.is_bool_flag}
+
+    boolean_flags = []
+    for flag in flags:
+        if flag in on_off_flags_by_flag:
+            boolean_flags.append(on_off_flags_by_flag[flag][args[flag]])
+
+    value_by_flag = {flag: args[flag] for flag in flags if flag not in on_off_flags_by_flag}
+    value_by_flag = {flag.replace('_', '-'): process_arg(value) for flag, value in value_by_flag.items()}
+    value_by_flag = {flag: value for flag, value in value_by_flag.items() if value is not None and value != ''}
+
+    sorted_flags = sorted(value_by_flag.keys())
+    script = 'csv-plot generate ' \
+           + ' '.join('--{} {}'.format(flag, value_by_flag[flag]) for flag in sorted_flags) + ' ' \
+           + ' '.join(boolean_flags) \
+           + ' --output output.png'
+
+    script = script.replace('--', '\\\n    --')
+
+    return cgi.escape(script)
+
+
+def process_arg(arg):
+    if type(arg) == list:
+        return ','.join(arg)
+    return arg
+
+
+def create_plot_tabs(plot, script):
+    return '''
+    <div>
+      <ul class="nav nav-pills" id="sidebar-tabs" role="tablist">
+        <li class="nav-item">
+          <a data-toggle="pill" class="nav-link active text-center" href="#plot-tab" role="tab">Plot</a>
+        </li>
+        <li class="nav-item">
+          <a data-toggle="pill" class="nav-link text-center" href="#regenerate-tab" role="tab">Re-generate</a>
+        </li>
+      </ul>
+
+      <div class="tab-content">
+        <div id="plot-tab" role="tabpanel" class="tab-pane active">
+          {plot}
+        </div>
+        <div id="regenerate-tab" role="tabpanel" class="tab-pane">
+          <textarea class="form-control" id="exampleFormControlTextarea1" rows="{rows}" style="width: 800px;">{script}</textarea>
+        </div>
+      </div>
+    </div>
+    '''.format(plot=plot, rows=len(script.split('\n')), script=script)
+
+
 def get_class_name(object):
     return object.__class__.__name__
 
@@ -476,8 +544,6 @@ PLOT_GROUP_BY_PLOT = {
 @click.option('--excel', help="Excel file to load")
 @click.option('--delimiter', default=',', show_default=True, help="Delimiter to use in CSV file")
 @click.option('--sheet-name', default=0, type=str, help="Excel sheet to load. Defaults to first sheet")
-@click.option('--skip-rows', default=0, show_default=True, help="Rows to skip at the beginning")
-@click.option('--skip-blank-lines/--include-blank-lines', default=False, show_default=True, help="Skip over blank lines rather than interpreting as NaN values")
 @click.option('--output', help="Output filename", required=True)
 @click.option('--plot', help="Plot type", required=True,
               type=click.Choice(
@@ -530,7 +596,7 @@ def generate(**kwargs):
 
     args = AttrDict(kwargs)
 
-    df, name = load_data(args.csv, args.delimiter, args.excel, args.sheet_name, args.skip_blank_lines, args.skip_rows)
+    df, name = load_data(args.csv, args.delimiter, args.excel, args.sheet_name)
 
     sns.set_style(args.plot_style)
 
@@ -545,15 +611,109 @@ def generate(**kwargs):
     image.save(args.output)
 
 
-
 PLOT_FN_BY_NAME = {
-    'heatmap': create_heatmap,
+    'pivot': create_heatmap,
     'category-plot': create_category_plot,
     'relative-plot': create_relative_plot,
     'regplot': create_regplot,
     'pair-plot': create_pair_plot,
     'joint-plot': create_joint_plot,
 }
+
+
+DEFAULT_FLAGS = {
+    'plot',
+    'csv',
+    'excel',
+    'delimiter',
+    'sheet_name',
+}
+
+
+FLAGS_BY_PLOT_NAME = {
+    'pivot': {
+        'aggregate',
+        'values',
+        'rows',
+        'columns',
+        'heatmap_annotate',
+        'heatmap_square',
+    },
+    'category-plot': {
+        'columns',
+        'rows',
+        'strip_plot_alpha',
+        'strip_plot_dodge',
+        'box_plot_enhance',
+        'violin_inner',
+        'violin_plot_split',
+        'aggregate',
+        'values',
+        'facet_height',
+        'facet_width',
+        'min_y',
+        'max_y',
+        'y_scale',
+    },
+    'relative-plot': {
+        'xaxis',
+        'values',
+        'colors',
+        'shapes',
+        'sizes',
+        'rows',
+        'columns',
+        'scatter_alpha',
+        'facet_height',
+        'facet_width',
+        'min_x',
+        'max_x',
+        'min_y',
+        'max_y',
+        'x_scale',
+        'y_scale',
+    },
+    'regplot': {
+        'xaxis',
+        'values',
+        'colors',
+        'rows',
+        'columns',
+        'regplot_order',
+        'facet_height',
+        'facet_width',
+        'min_x',
+        'max_x',
+        'min_y',
+        'max_y',
+        'x_scale',
+        'y_scale',
+    },
+    'pair-plot': {
+        'colors',
+        'values',
+        'facet_height',
+        'facet_width',
+        'pair_plot_diag',
+        'pair_plot_upper',
+        'pair_plot_lower',
+        'min_x',
+        'max_x',
+        'min_y',
+        'max_y',
+        'x_scale',
+        'y_scale',
+    },
+    'joint-plot': {
+        'xaxis',
+        'values',
+        'facet_height',
+        'joint_plot_kind',
+        'joint_plot_hist',
+        'joint_plot_kde',
+    },
+}
+
 
 if __name__ == "__main__":
     cli()
